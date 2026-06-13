@@ -450,26 +450,39 @@ let wallMeshes=bunkerWallMeshes; // active set for raycasting; swapped by setEnv
 function makeTex(type){
   const sz=256,c=document.createElement('canvas');c.width=c.height=sz;const ctx=c.getContext('2d');
   if(type==='wall'){
-    // Military concrete brick — dark base, mortar lines, weathering
-    ctx.fillStyle='#78817a';ctx.fillRect(0,0,sz,sz);
-    // Noise grain for rough surface
-    for(let i=0;i<2800;i++){const v=Math.floor(Math.random()*34-17);const b=120+v;ctx.fillStyle=`rgba(${b-3},${b},${b-5},${Math.random()*0.22})`;ctx.fillRect(Math.random()*sz,Math.random()*sz,Math.random()*4+1,Math.random()*3+1);}
-    // Staggered brick rows
-    const bW=62,bH=30;
-    // Dark mortar fill first
-    ctx.fillStyle='rgba(30,34,26,0.55)';
-    for(let y=0;y<sz;y+=bH){const off=(Math.floor(y/bH)%2)*(bW/2);for(let x=-bW;x<sz+bW;x+=bW){ctx.fillRect(x+off,y,3,bH);ctx.fillRect(x+off,y,bW,3);}}
-    // Brick face slight variation
-    for(let y=0;y<sz;y+=bH){const off=(Math.floor(y/bH)%2)*(bW/2);for(let x=-bW;x<sz+bW;x+=bW){const v=Math.random()*16-8;ctx.fillStyle=`rgba(${120+v},${122+v},${115+v},0.18)`;ctx.fillRect(x+off+3,y+3,bW-6,bH-6);}}
-    // Inner highlight (top-left of each brick)
-    ctx.strokeStyle='rgba(160,165,152,0.38)';ctx.lineWidth=1;
-    for(let y=0;y<sz;y+=bH){const off=(Math.floor(y/bH)%2)*(bW/2);for(let x=-bW;x<sz+bW;x+=bW){ctx.beginPath();ctx.moveTo(x+off+4,y+bH-5);ctx.lineTo(x+off+4,y+4);ctx.lineTo(x+off+bW-4,y+4);ctx.stroke();}}
-    // Vertical water-stain drips
-    for(let i=0;i<12;i++){const x=Math.random()*sz,y0=Math.random()*(sz*0.5),h=Math.random()*90+30;const g=ctx.createLinearGradient(x,y0,x,y0+h);g.addColorStop(0,'rgba(18,26,14,0)');g.addColorStop(0.45,'rgba(18,26,14,0.24)');g.addColorStop(1,'rgba(18,26,14,0)');ctx.fillStyle=g;ctx.fillRect(x-1.5,y0,3,h);}
-    // Chips and dark impact spots
-    for(let i=0;i<35;i++){ctx.fillStyle=`rgba(28,30,24,${Math.random()*0.32+0.06})`;ctx.fillRect(Math.random()*sz,Math.random()*sz,Math.random()*9+2,Math.random()*7+2);}
-    // Moss/algae creep at base
-    for(let i=0;i<25;i++){ctx.fillStyle=`rgba(36,65,26,${Math.random()*0.22})`;ctx.fillRect(Math.random()*sz,sz-Math.random()*35-4,Math.random()*18+4,Math.random()*28+6);}
+    // Natural stone masonry — irregular blocks, rough surface
+    ctx.fillStyle='#7a7870';ctx.fillRect(0,0,sz,sz);
+    // Base surface noise — grainy stone
+    for(let i=0;i<3200;i++){const v=Math.floor(Math.random()*36-18);const b=122+v;ctx.fillStyle=`rgba(${b-5},${b},${b-9},${Math.random()*0.24})`;ctx.fillRect(Math.random()*sz,Math.random()*sz,Math.random()*5+1,Math.random()*4+1);}
+    // Irregular stone blocks (random widths and heights per row)
+    const stones=[];let gy=0;
+    while(gy<sz+10){
+      const bH=14+Math.floor(Math.random()*22); // 14-36px tall rows
+      let gx=Math.floor(Math.random()*16)-8;    // random row offset
+      while(gx<sz+10){
+        const bW=18+Math.floor(Math.random()*44); // 18-62px wide
+        stones.push({x:gx,y:gy,w:bW,h:bH});
+        gx+=bW;
+      }
+      gy+=bH;
+    }
+    // Dark mortar joints
+    ctx.fillStyle='rgba(26,24,18,0.72)';
+    stones.forEach(({x,y,w,h})=>{ctx.fillRect(x,y,w,2);ctx.fillRect(x,y,2,h);});
+    // Stone face colour variation per block
+    stones.forEach(({x,y,w,h})=>{const v=Math.random()*24-12;const r2=118+v,g2=116+v,b2=106+v;ctx.fillStyle=`rgba(${r2},${g2},${b2},0.18)`;ctx.fillRect(x+3,y+3,w-6,h-6);});
+    // Bevel highlight (top-left edge of each stone)
+    ctx.strokeStyle='rgba(168,164,150,0.32)';ctx.lineWidth=1;
+    stones.forEach(({x,y,w,h})=>{ctx.beginPath();ctx.moveTo(x+3,y+h-4);ctx.lineTo(x+3,y+3);ctx.lineTo(x+w-4,y+3);ctx.stroke();});
+    // Shadow edge (bottom-right)
+    ctx.strokeStyle='rgba(18,16,12,0.38)';ctx.lineWidth=1;
+    stones.forEach(({x,y,w,h})=>{ctx.beginPath();ctx.moveTo(x+w-3,y+3);ctx.lineTo(x+w-3,y+h-3);ctx.lineTo(x+3,y+h-3);ctx.stroke();});
+    // Surface cracks crossing block faces
+    for(let i=0;i<16;i++){ctx.strokeStyle=`rgba(30,26,18,${Math.random()*0.5+0.15})`;ctx.lineWidth=Math.random()*1.4+0.3;ctx.beginPath();const sx=Math.random()*sz,sy=Math.random()*sz;ctx.moveTo(sx,sy);for(let j=0;j<6;j++)ctx.lineTo(sx+(Math.random()*18-9),sy+(Math.random()*16-8));ctx.stroke();}
+    // Lichen / moss patches
+    for(let i=0;i<22;i++){ctx.fillStyle=`rgba(52,72,32,${Math.random()*0.2})`;ctx.beginPath();ctx.arc(Math.random()*sz,Math.random()*sz,Math.random()*9+2,0,Math.PI*2);ctx.fill();}
+    // Water stain drips
+    for(let i=0;i<10;i++){const x=Math.random()*sz,y0=Math.random()*(sz*0.4),h=Math.random()*80+20;const g=ctx.createLinearGradient(x,y0,x,y0+h);g.addColorStop(0,'rgba(14,20,10,0)');g.addColorStop(0.5,'rgba(14,20,10,0.2)');g.addColorStop(1,'rgba(14,20,10,0)');ctx.fillStyle=g;ctx.fillRect(x-1,y0,2.5,h);}
   } else if(type==='rock'){
     // Rocky stone surface for hills level walls
     ctx.fillStyle='#665540';ctx.fillRect(0,0,sz,sz);
@@ -518,7 +531,7 @@ const wallTex=makeTex('wall');wallTex.repeat.set(1,1);
 const floorTex=makeTex('floor');floorTex.repeat.set(10,10);
 const ceilTex=makeTex('ceil');ceilTex.repeat.set(10,10);
 const rockTex=makeTex('rock');rockTex.repeat.set(1,1);
-const wallMat=new THREE.MeshLambertMaterial({map:wallTex,color:0xe8e0d0});
+const wallMat=new THREE.MeshLambertMaterial({map:wallTex,color:0xd8d4cc});
 const floorMat=new THREE.MeshLambertMaterial({map:floorTex,color:0x777777});
 const ceilMat=new THREE.MeshLambertMaterial({map:ceilTex,color:0x888899});
 const planeGeo=new THREE.PlaneGeometry(COLS*CS,ROWS*CS);
@@ -562,7 +575,7 @@ for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){if(MAP[r][c]===1){const m=new THR
 // ─── HILLS ENVIRONMENT (built once, toggled visible) ─────────────────
 (()=>{
   const rockH=WH*2.0;
-  const rockMat=new THREE.MeshLambertMaterial({map:wallTex,color:0xe8e0d0});
+  const rockMat=new THREE.MeshLambertMaterial({map:wallTex,color:0xd8d4cc});
 
   // ── Rolling hill terrain (vertex-displaced plane) ───────────────────
   const grassTex=makeTex('grass');grassTex.repeat.set(10,10);
