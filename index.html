@@ -170,14 +170,14 @@ body.touch-device #overlay button{font-size:17px;padding:18px 64px;border-width:
     <span style="color:#aaa">Click</span> — Fire &nbsp;|&nbsp; <span style="color:#aaa">R</span> — Reload &nbsp;|&nbsp; <span style="color:#aaa">Shift</span> — Sprint<br>
     <span style="color:#aaa">Space</span> — Jump &nbsp;|&nbsp; <span style="color:#aaa">Ctrl</span> — Crouch<br><br>
     <span style="color:#ffdc00">Each kill earns coins. Spend them in the shop when you die.</span><br>
-    <span style="color:#44ccff">Levels 1-2: Bunker — get the key &amp; escape.<br>Level 3+: Hills — kill 10 enemies then reach extraction.</span>
+    <span style="color:#44ccff">Levels 1-2: Bunker — get the key &amp; escape.<br>Level 3+: Grass — kill 10 enemies then reach extraction.</span>
   </div>
   <div class="info mobile-info" style="display:none">
     <span style="color:#aaa">Left thumb</span> — Move &nbsp;|&nbsp; <span style="color:#aaa">Right side</span> — Aim<br>
     <span style="color:#ff4136">FIRE</span> — Shoot &nbsp;|&nbsp; <span style="color:#aaa">JUMP</span> — Jump &nbsp;|&nbsp; <span style="color:#ffdc00">RELOAD</span> — Reload<br>
     <span style="color:#aaa">SPRINT</span> — Run &nbsp;|&nbsp; <span style="color:#aaa">DUCK</span> — Crouch<br><br>
     <span style="color:#ffdc00">Each kill earns coins. Spend them in the shop when you die.</span><br>
-    <span style="color:#44ccff">Levels 1-2: Bunker — get the key &amp; escape.<br>Level 3+: Hills — kill 10 enemies then reach extraction.</span>
+    <span style="color:#44ccff">Levels 1-2: Bunker — get the key &amp; escape.<br>Level 3+: Grass — kill 10 enemies then reach extraction.</span>
   </div>
   <button id="start-btn">[ Deploy ]</button>
 </div>
@@ -495,6 +495,17 @@ function makeTex(type){
     for(let i=0;i<20;i++){ctx.fillStyle=`rgba(10,9,8,${Math.random()*0.45})`;ctx.fillRect(Math.random()*sz,Math.random()*sz,Math.random()*30+4,Math.random()*20+3);}
     // Scuff/wear spots (slightly lighter)
     for(let i=0;i<10;i++){ctx.fillStyle=`rgba(58,55,48,${Math.random()*0.2})`;ctx.beginPath();ctx.arc(Math.random()*sz,Math.random()*sz,Math.random()*22+8,0,Math.PI*2);ctx.fill();}
+  } else if(type==='grass'){
+    // Outdoor grass — rich green base
+    ctx.fillStyle='#3d6f1a';ctx.fillRect(0,0,sz,sz);
+    // Colour noise for variation
+    for(let i=0;i<3500;i++){const v=Math.floor(Math.random()*28-14);const g=110+v;ctx.fillStyle=`rgba(${28+v},${g},${8+v},${Math.random()*0.55})`;ctx.fillRect(Math.random()*sz,Math.random()*sz,Math.random()*5+1,Math.random()*4+1);}
+    // Individual grass blade strokes
+    for(let i=0;i<600;i++){const x=Math.random()*sz,y=Math.random()*sz,h=Math.random()*14+5;ctx.strokeStyle=`rgba(${30+Math.random()*50|0},${90+Math.random()*80|0},${5+Math.random()*20|0},${Math.random()*0.55+0.25})`;ctx.lineWidth=0.7+Math.random()*0.6;ctx.beginPath();ctx.moveTo(x,y+h*0.5);ctx.quadraticCurveTo(x+(Math.random()*5-2.5),y,x+(Math.random()*8-4),y-h*0.5);ctx.stroke();}
+    // Dark clumps
+    for(let i=0;i<20;i++){ctx.fillStyle=`rgba(15,50,6,${Math.random()*0.3})`;ctx.beginPath();ctx.arc(Math.random()*sz,Math.random()*sz,Math.random()*14+4,0,Math.PI*2);ctx.fill();}
+    // Dirt scuffs / worn patches
+    for(let i=0;i<12;i++){ctx.fillStyle=`rgba(90,62,22,${Math.random()*0.22})`;ctx.beginPath();ctx.ellipse(Math.random()*sz,Math.random()*sz,Math.random()*18+4,Math.random()*10+3,Math.random()*Math.PI,0,Math.PI*2);ctx.fill();}
   } else {
     // Dark ceiling with subtle panel lines
     ctx.fillStyle='#2a2a38';ctx.fillRect(0,0,sz,sz);
@@ -551,8 +562,9 @@ for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){if(MAP[r][c]===1){const m=new THR
 // ─── HILLS ENVIRONMENT (built once, toggled visible) ─────────────────
 (()=>{
   const rockH=WH*2.0;
-  const rockMat=new THREE.MeshLambertMaterial({map:wallTex,color:0x9a8a78});
-  const hillFloorMat=new THREE.MeshLambertMaterial({color:0x3a7020});
+  const rockMat=new THREE.MeshLambertMaterial({map:wallTex,color:0xe8e0d0});
+  const grassTex=makeTex('grass');grassTex.repeat.set(8,8);
+  const hillFloorMat=new THREE.MeshLambertMaterial({map:grassTex,color:0xddffdd});
   const hFloor=new THREE.Mesh(new THREE.PlaneGeometry(COLS*CS,ROWS*CS),hillFloorMat);
   hFloor.rotation.x=-Math.PI/2;hFloor.position.set(COLS*CS/2,0,ROWS*CS/2);hillsGroup.add(hFloor);
   // Rock wall blocks (taller than bunker walls)
