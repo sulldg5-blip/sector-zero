@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SECTOR ZERO — Military FPS</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #000;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    overflow-x: hidden;
+  }
+
+  /* scanlines like the game */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.08) 3px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 40px;
+    background: rgba(0,0,0,0.9);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .nav-logo {
+    font-size: 16px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  nav a {
+    color: #666;
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-left: 32px;
+    transition: color 0.2s;
+  }
+  nav a:hover { color: #fff; }
+  nav a.play-link { color: #2ecc40; }
+
+  /* ── HERO — matches the game overlay exactly ── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 20px 60px;
+    position: relative;
+    background: #000;
+  }
+
+  /* subtle grid like the game's 3D floor */
+  #hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  #hero h1 {
+    font-size: clamp(46px, 10vw, 90px);
+    letter-spacing: 12px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    position: relative;
+    font-weight: normal;
+  }
+
+  .hero-sub {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+    position: relative;
+  }
+
+  .hero-info {
+    font-size: 13px;
+    color: #999;
+    line-height: 2.4;
+    text-align: center;
+    margin-bottom: 40px;
+    letter-spacing: 1px;
+    position: relative;
+  }
+
+  .hero-info .hl-yellow { color: #ffdc00; }
+  .hero-info .hl-blue   { color: #44ccff; }
+  .hero-info .hl-grey   { color: #aaa; }
+
+  .btn-group {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: relative;
+  }
+
+  .btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.35);
+    color: #fff;
+    padding: 13px 42px;
+    font-size: 13px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.7);
+  }
+  .btn-green {
+    border-color: rgba(46,204,64,0.5);
+    color: #2ecc40;
+  }
+  .btn-green:hover {
+    background: rgba(46,204,64,0.08);
+    border-color: #2ecc40;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 50px;
+    margin-top: 60px;
+    position: relative;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-size: 30px;
+    color: #fff;
+    display: block;
+    letter-spacing: 2px;
+  }
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #444;
+    margin-top: 6px;
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 80px 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .section-inner {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .section-tag {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: #444;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    font-size: clamp(24px, 4vw, 38px);
+    font-weight: normal;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 14px;
+  }
+
+  .h2-sub {
+    font-size: 12px;
+    color: #444;
+    margin-bottom: 50px;
+    letter-spacing: 2px;
+  }
+
+  /* ── FEATURES ── */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .feature-card {
+    background: #000;
+    padding: 28px 24px;
+    transition: background 0.2s;
+  }
+  .feature-card:hover { background: rgba(255,255,255,0.03); }
+
+  .feature-icon {
+    font-size: 20px;
+    margin-bottom: 14px;
+    display: block;
+    opacity: 0.7;
+  }
+
+  .feature-title {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  .feature-desc {
+    font-size: 12px;
+    line-height: 1.8;
+    color: #555;
+  }
+
+  /* ── LEVELS ── */
+  .levels-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .level-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .level-row:first-child { border-top: 1px solid rgba(255,255,255,0.06); }
+
+  .level-num {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #333;
+    min-width: 28px;
+  }
+
+  .level-info { flex: 1; }
+
+  .level-name {
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #ccc;
+    margin-bottom: 4px;
+  }
+
+  .level-detail {
+    font-size: 11px;
+    color: #444;
+    letter-spacing: 1px;
+  }
+
+  .level-env {
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 4px 10px;
+    border: 1px solid;
+    text-transform: uppercase;
+  }
+  .env-bunker { color: #4488ff; border-color: rgba(68,136,255,0.25); }
+  .env-hills  { color: #2ecc40; border-color: rgba(46,204,64,0.25); }
+
+  .level-diff {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+  .diff-pip {
+    width: 6px; height: 6px;
+    background: #ff4136;
+  }
+  .diff-pip.off { background: #1a1a1a; }
+
+  /* ── CONTROLS ── */
+  .controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .control-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #000;
+    padding: 16px 20px;
+    transition: background 0.15s;
+  }
+  .control-item:hover { background: rgba(255,255,255,0.03); }
+
+  .key {
+    font-size: 11px;
+    background: #0a0a0a;
+    border: 1px solid #222;
+    border-bottom: 3px solid #222;
+    padding: 5px 10px;
+    color: #fff;
+    white-space: nowrap;
+    min-width: 60px;
+    text-align: center;
+    letter-spacing: 1px;
+  }
+
+  .control-desc {
+    font-size: 12px;
+    color: #666;
+    letter-spacing: 1px;
+  }
+
+  /* ── TIPS ── */
+  .tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.06);
+    margin-top: 40px;
+  }
+
+  .tip {
+    display: flex;
+    gap: 14px;
+    background: #000;
+    padding: 18px 20px;
+    border-left: 2px solid #ff4136;
+  }
+
+  .tip-num {
+    font-size: 11px;
+    color: #ff4136;
+    opacity: 0.35;
+    min-width: 20px;
+    letter-spacing: 1px;
+  }
+
+  .tip-text {
+    font-size: 12px;
+    color: #555;
+    line-height: 1.8;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── CTA ── */
+  #cta {
+    text-align: center;
+    background: #000;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #000;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 24px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .footer-logo {
+    font-size: 12px;
+    letter-spacing: 6px;
+    color: #222;
+    text-transform: uppercase;
+  }
+
+  .footer-copy {
+    font-size: 11px;
+    color: #222;
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 600px) {
+    nav { padding: 12px 20px; }
+    .nav-links { display: none; }
+    .hero-stats { gap: 24px; }
+    .stat-num { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">SECTOR ZERO</div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#levels">Levels</a>
+    <a href="#howto">Controls</a>
+    <a href="sector-zero.html" download="sector-zero.html">⬇ Download</a>
+    <a href="sector-zero.html" class="play-link">[ Play ]</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <h1>Sector Zero</h1>
+  <div class="hero-sub">Tactical Shooter — Browser FPS</div>
+
+  <div class="hero-info">
+    <span class="hl-grey">W A S D</span> — Move &nbsp;|&nbsp; <span class="hl-grey">Mouse</span> — Aim<br>
+    <span class="hl-grey">Click</span> — Fire &nbsp;|&nbsp; <span class="hl-grey">R</span> — Reload &nbsp;|&nbsp; <span class="hl-grey">Shift</span> — Sprint<br>
+    <span class="hl-grey">Space</span> — Jump &nbsp;|&nbsp; <span class="hl-grey">Ctrl</span> — Crouch<br><br>
+    <span class="hl-yellow">Each kill earns coins. Spend them in the shop when you die.</span><br>
+    <span class="hl-blue">Levels 1–2: Bunker — get the key &amp; escape.<br>Level 3+: Hills — kill 10 enemies then reach extraction.</span>
+  </div>
+
+  <div class="btn-group">
+    <a href="sector-zero.html" class="btn btn-green">[ Deploy ]</a>
+    <a href="sector-zero.html" download="sector-zero.html" class="btn">[ Download ]</a>
+    <a href="#howto" class="btn">[ How to Play ]</a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-num">5</span>
+      <span class="stat-label">Levels</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">3</span>
+      <span class="stat-label">Boss Phases</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">FREE</span>
+      <span class="stat-label">Always</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">0</span>
+      <span class="stat-label">Downloads</span>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-inner">
+    <div class="section-tag">// Core Systems</div>
+    <h2>What You're Up Against</h2>
+    <p class="h2-sub">Five levels. Two environments. One commander standing between you and extraction.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🎯</span>
+        <div class="feature-title">True FPS Combat</div>
+        <p class="feature-desc">First-person hitscan shooting with spread, damage falloff, and real-time enemy AI that seeks cover, flanks, and returns fire.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">💀</span>
+        <div class="feature-title">3-Phase Boss Fights</div>
+        <p class="feature-desc">The Commander adapts. At 55% HP he enrages — faster, harder. At 20% he goes berserk. Survive all three phases or die trying.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🏔️</span>
+        <div class="feature-title">Two Environments</div>
+        <p class="feature-desc">Start underground in concrete bunkers. Fight your way to open hilltop combat zones where enemies have nowhere to hide — and neither do you.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🪙</span>
+        <div class="feature-title">Persistent Upgrades</div>
+        <p class="feature-desc">Earn coins from kills and spend them in the shop between waves. Buy armor, upgrade weapons, or boost max HP. Your loadout carries forward.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔫</span>
+        <div class="feature-title">Escalating Firepower</div>
+        <p class="feature-desc">Enemies upgrade too. From pistols in Level 1 to LMGs and heavy weapons in Level 5 — the threat level never stops rising.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🗺️</span>
+        <div class="feature-title">Tactical Minimap</div>
+        <p class="feature-desc">Live minimap tracks enemy positions, the boss, your location, and objectives. Use it to plan your approach or know when you're surrounded.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LEVELS -->
+<section id="levels">
+  <div class="section-inner">
+    <div class="section-tag">// Campaign</div>
+    <h2>Five Levels. No Mercy.</h2>
+    <p class="h2-sub">Each level adds more enemies, better weapons, and a deadlier Commander.</p>
+
+    <div class="levels-list">
+      <div class="level-row">
+        <div class="level-num">01</div>
+        <div class="level-info">
+          <div class="level-name">Initiation</div>
+          <div class="level-detail">8 enemies · Pistols · Find the key. Reach the exit.</div>
+        </div>
+        <span class="level-env env-bunker">Bunker</span>
+        <div class="level-diff">
+          <div class="diff-pip"></div>
+          <div class="diff-pip off"></div>
+          <div class="diff-pip off"></div>
+          <div class="diff-pip off"></div>
+          <div class="diff-pip off"></div>
+        </div>
+      </div>
+      <div class="level-row">
+        <div class="level-num">02</div>
+        <div class="level-info">
+          <div class="level-name">Lockdown</div>
+          <div class="level-detail">10 enemies · SMGs · Faster patrols. Tighter rooms.</div>
+        </div>
+        <span class="level-env env-bunker">Bunker</span>
+        <div class="level-diff">
+          <div class="diff-pip"></div>
+          <div class="diff-pip"></div>
+          <div class="diff-pip off"></div>
+          <div class="diff-pip off"></div>
+          <div class="diff-pip off"></div>
+        </div>
+      </div>
+      <div class="level-row">
+        <div class="level-num">03</div>
+        <div class="level-info">
+          <div class="level-name">Hilltop Assault</div>
+          <div class="level-detail">14 enemies · Assault Rifles · Kill 10 to reach extraction.</div>
+        </div>
+        <span class="level-env env-hills">Hills</span>
+        <div class="level-diff">
+          <div class="diff-pip"></div>
+          <div class="diff-pip"></div>
+          <div class="diff-pip"></div>
+          <div class="diff-pip off"></div>
+          <div class="diff-pip off"></div>
+        </div>
+      </div>
+      <div class="level-row">
+        <div class="level-num">04</div>
+        <div class="level-info">
+          <div class="level-name">Suppression</div>
+          <div class="level-detail">16 enemies · LMGs · High fire rate. Constant pressure.</div>
+        </div>
+        <span class="level-env env-hills">Hills</span>
+        <div class="level-diff">
+          <div class="diff-pip"></div>
+          <div class="diff-pip"></div>
+          <div class="diff-pip"></div>
+          <div class="diff-pip"></div>
+          <div class="diff-pip off"></div>
+        </div>
+      </div>
+      <div class="level-row">
+        <div class="level-num">05</div>
+        <div class="level-info">
+          <div class="level-name">Zero Hour</div>
+          <div class="level-detail">20 enemies · Heavy Weapons · Maximum threat. No way out but through.</div>
+        </div>
+        <span class="level-env env-hills">Hills</span>
+        <div class="level-diff">
+          <div class="diff-pip"></div>
+          <div class="diff-pip"></div>
+          <div class="diff-pip"></div>
+          <div class="diff-pip"></div>
+          <div class="diff-pip"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW TO PLAY -->
+<section id="howto">
+  <div class="section-inner">
+    <div class="section-tag">// Controls</div>
+    <h2>How to Play</h2>
+    <p class="h2-sub">Click the game to lock your mouse. Press Escape to unlock.</p>
+
+    <div class="controls-grid">
+      <div class="control-item"><span class="key">W A S D</span><span class="control-desc">Move</span></div>
+      <div class="control-item"><span class="key">Mouse</span><span class="control-desc">Aim / Look</span></div>
+      <div class="control-item"><span class="key">Click</span><span class="control-desc">Shoot</span></div>
+      <div class="control-item"><span class="key">R</span><span class="control-desc">Reload</span></div>
+      <div class="control-item"><span class="key">Shift</span><span class="control-desc">Sprint</span></div>
+      <div class="control-item"><span class="key">1 – 5</span><span class="control-desc">Switch Weapon</span></div>
+      <div class="control-item"><span class="key">B</span><span class="control-desc">Open Shop</span></div>
+      <div class="control-item"><span class="key">Esc</span><span class="control-desc">Pause / Unlock Mouse</span></div>
+    </div>
+
+    <div class="tips-grid">
+      <div class="tip"><span class="tip-num">01</span><p class="tip-text">Use cover — enemies have deadly aim at close range and will push if they see you stop moving.</p></div>
+      <div class="tip"><span class="tip-num">02</span><p class="tip-text">Save coins for armor early on. Level 3+ armor halves incoming damage — a huge survival boost.</p></div>
+      <div class="tip"><span class="tip-num">03</span><p class="tip-text">The boss charges when enraged. Keep distance and strafe. His berserk phase fires 7-shot bursts.</p></div>
+      <div class="tip"><span class="tip-num">04</span><p class="tip-text">In hills levels, use rock clusters for cover. You need 10 kills before the extraction zone opens.</p></div>
+      <div class="tip"><span class="tip-num">05</span><p class="tip-text">Check the minimap constantly. Red dots are enemies, yellow is the boss, green is the exit.</p></div>
+      <div class="tip"><span class="tip-num">06</span><p class="tip-text">Don't rush the boss until most regular enemies are cleared — getting flanked mid-fight is lethal.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="section-inner" style="text-align:center;">
+    <div class="section-tag" style="margin-bottom:18px;">// Ready?</div>
+    <h2 style="margin-bottom:12px;">No Download.<br>No Login. Just Fight.</h2>
+    <p style="font-size:12px;color:#444;letter-spacing:2px;margin-bottom:44px;">Runs entirely in your browser. No install. No account.</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <a href="sector-zero.html" class="btn btn-green" style="font-size:15px;padding:16px 56px;">[ Deploy Now ]</a>
+      <a href="sector-zero.html" download="sector-zero.html" class="btn" style="font-size:14px;padding:16px 36px;">[ Download Offline ]</a>
+    </div>
+    <p style="font-size:10px;color:#222;letter-spacing:2px;margin-top:18px;">Single HTML file · Works offline · Free forever</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Sector Zero</div>
+  <div class="footer-copy">Free to play · Built with Three.js</div>
+</footer>
+
+</body>
+</html>
