@@ -2198,21 +2198,30 @@ function pvpStartMatch(){
 }
 
 function pvpBeginMatch(asHost){
-  pvpCleanupLobby(); // leave lobby while in match
+  pvpCleanupLobby();
   document.getElementById('pvp-overlay').classList.remove('show');
   PVP.active=true;PVP.myKills=0;PVP.oppKills=0;PVP.isHost=asHost;
   document.body.classList.add('pvp-active');
   pvpUpdateHUD();
+  // Force level 1 bunker map
+  STORE.level=1;
+  initGame();
+  G.enemies=[];G.weaponPickups.forEach(wp=>{scene.remove(wp.mesh);scene.remove(wp.glow);scene.remove(wp.ring);});G.weaponPickups=[];
+  document.getElementById('objective-hud').style.display='none';
   setEnvironment('bunker');
-  initGame();G.enemies=[];
   G.running=true;G.paused=false;G.lastTime=performance.now();
+  const eyeH=WH*0.58;
   const myZ=asHost?17*CS:3*CS;
   const oppZ=asHost?3*CS:17*CS;
-  cam.position.set(COLS*CS/2,G.p.height,myZ);G.p.pos.set(COLS*CS/2,0,myZ);
-  PVP.oppPos.set(COLS*CS/2,0,oppZ);
+  const midX=COLS*CS/2;
+  cam.position.set(midX,eyeH,myZ);
+  G.p.pos.set(midX,0,myZ);
+  G.yaw=asHost?Math.PI:0; // face toward opponent
+  G.pitch=0;
+  PVP.oppPos.set(midX,0,oppZ);
   if(PVP.oppMesh){scene.remove(PVP.oppMesh);PVP.oppMesh=null;}
   PVP.oppMesh=makeEnemyMesh(0xcc4400,3);
-  PVP.oppMesh.position.set(COLS*CS/2,0,oppZ);
+  PVP.oppMesh.position.set(midX,0,oppZ);
   scene.add(PVP.oppMesh);
   if(!IS_TOUCH)canvas.requestPointerLock();else G.mouse.locked=true;
   notify('1v1 VS '+PVP.oppName+' — First to '+PVP_WIN+' kills wins','#ff4136',4500);
@@ -2232,7 +2241,7 @@ function pvpRespawn(){
   const myZ=PVP.isHost?17*CS:3*CS;
   setTimeout(()=>{
     G.p.hp=100;G.p.shield=0;G.p.armorHp=0;
-    cam.position.set(COLS*CS/2,G.p.height,myZ);
+    cam.position.set(COLS*CS/2,WH*0.58,myZ);
     G.p.pos.set(COLS*CS/2,0,myZ);
     updateHUD();
   },2500);
