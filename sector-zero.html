@@ -2061,8 +2061,12 @@ function pvpRenderPlayerList(players){
 function pvpRequestChallenge(targetPeerId,targetName){
   if(!PVP.peer||!PVP.myPeerId)return;
   PVP.pendingTargetPeerId=targetPeerId;
-  notify('⚔ Challenge sent to '+targetName.toUpperCase()+'!','#ffdc00',3500);
-  document.getElementById('pvp-lobby-status').textContent='Challenging '+targetName.toUpperCase()+'...';
+  notify('⚔ Challenge sent to '+targetName.toUpperCase()+'! 20s to accept...','#ffdc00',4000);
+  document.getElementById('pvp-lobby-status').textContent='Waiting for '+targetName.toUpperCase()+'...';
+  if(PVP._challengeTimeout)clearTimeout(PVP._challengeTimeout);
+  PVP._challengeTimeout=setTimeout(()=>{
+    if(!PVP.active){notify('No response — challenge expired','#ff4136',2500);document.getElementById('pvp-lobby-status').textContent='Online';pvpShowScreen('pvp-lobby-screen');}
+  },20000);
   const msg={type:'challenge',fromName:PVP.myName,fromPeerId:PVP.myPeerId,targetPeerId};
   if(PVP.isLobbyHost){
     // Target is a client; relay directly
@@ -2080,6 +2084,7 @@ function pvpRequestChallenge(targetPeerId,targetName){
 }
 
 function pvpAcceptChallenge(){
+  if(PVP._challengeTimeout){clearTimeout(PVP._challengeTimeout);PVP._challengeTimeout=null;}
   const challengerPeerId=PVP.oppPeerId;
   const resp={type:'challenge_response',accepted:true,challengerPeerId,fromPeerId:PVP.myPeerId};
   if(PVP.isLobbyHost){
@@ -2114,14 +2119,7 @@ function pvpCancelChallenge(){
 function pvpShowCountdown(oppName){
   pvpShowScreen('pvp-countdown-screen');
   document.getElementById('pvp-opp-label').textContent=oppName.toUpperCase();
-  let n=3;
-  const el=document.getElementById('pvp-countdown-num');
-  el.textContent=n;
-  const tick=setInterval(()=>{
-    n--;
-    if(n>0){el.textContent=n;}
-    else{clearInterval(tick);}
-  },1000);
+  document.getElementById('pvp-countdown-num').textContent='GO!';
 }
 
 function pvpDoConnectToOpponent(){
@@ -2135,13 +2133,21 @@ function pvpManualChallenge(){
   const raw=document.getElementById('pvp-target-id').value.trim();
   if(!raw||!PVP.peer){notify('Enter your opponent\'s code first','#ff4136',2000);return;}
   const tid=raw.startsWith('sz-')?raw:'sz-'+raw;
-  document.getElementById('pvp-lobby-status').textContent='Connecting...';
-  // Flash the button so player knows tap registered
+  document.getElementById('pvp-lobby-status').textContent='Waiting for opponent...';
   const btn=document.querySelector('#pvp-lobby-screen .pvp-btn.pvp-red');
-  if(btn){const orig=btn.textContent;btn.textContent='[ Sending... ]';btn.disabled=true;setTimeout(()=>{btn.textContent=orig;btn.disabled=false;},3000);}
-  notify('⚔ Challenge sent! Waiting for opponent...','#ffdc00',3500);
+  if(btn){const orig=btn.textContent;btn.textContent='[ Waiting 20s... ]';btn.disabled=true;setTimeout(()=>{btn.textContent=orig;btn.disabled=false;},20000);}
+  notify('⚔ Challenge sent! Opponent has 20 seconds to accept...','#ffdc00',4000);
   const conn=PVP.peer.connect(tid,{reliable:true});
   pvpBind(conn,true);
+  // Auto-cancel after 20 seconds if no response
+  if(PVP._challengeTimeout)clearTimeout(PVP._challengeTimeout);
+  PVP._challengeTimeout=setTimeout(()=>{
+    if(!PVP.active){
+      notify('No response — challenge expired','#ff4136',2500);
+      document.getElementById('pvp-lobby-status').textContent='Online';
+      pvpShowScreen('pvp-lobby-screen');
+    }
+  },20000);
 }
 
 // ─ Game connection ─────────────────────────────────────────────────────
@@ -2159,14 +2165,12 @@ function pvpOnData(d){
       PVP.oppName=d.name;
       pvpShowCountdown(d.name);
       if(!PVP.isHost){
-        // Challenger auto-starts: send start signal after countdown
         PVP.conn.send({type:'hello',name:PVP.myName});
-        setTimeout(()=>{if(PVP.conn&&PVP.conn.open)pvpStartMatch();},3000);
+        setTimeout(()=>{if(PVP.conn&&PVP.conn.open)pvpStartMatch();},800);
       }
       break;
     case 'start':
-      // Host receives start from challenger — begin as non-host after countdown
-      setTimeout(()=>pvpBeginMatch(false),3000);
+      setTimeout(()=>pvpBeginMatch(false),800);
       break;
     case 'pos':
       PVP.oppPos.set(d.x,0,d.z);PVP.oppRot=d.ry;
