@@ -279,25 +279,32 @@ body.touch-device .pvp-btn{touch-action:manipulation;}
 <div id="pvp-overlay">
   <!-- LOBBY: main screen, shown immediately on open -->
   <div id="pvp-lobby-screen">
-    <h2>1v1 LOBBY</h2>
-    <div class="pvp-sub">Click a player to challenge — match starts automatically</div>
+    <h2>1v1</h2>
+    <div class="pvp-sub">Share your code — opponent enters it to connect</div>
     <div id="pvp-callsign-row">Playing as <span id="pvp-my-callsign">---</span> &nbsp;<span id="pvp-change-name" onclick="pvpChangeName()" title="Change callsign">✎</span></div>
-    <div id="pvp-lobby-status">Connecting...</div>
-    <div id="pvp-players-list"></div>
-    <div id="pvp-manual-toggle" onclick="pvpToggleManual()">▸ Connect by code</div>
-    <div id="pvp-manual-body">
-      <div id="pvp-room-box">
-        <div class="pvp-room-label">Your room code</div>
-        <div id="pvp-room-code-wrap">
-          <input type="text" id="pvp-room-code-input" maxlength="4" placeholder="1234" autocomplete="off" inputmode="numeric" pattern="[0-9]*" onkeydown="if(event.key==='Enter')pvpClaimCode()">
-          <button id="pvp-claim-btn" onclick="pvpClaimCode()">Set</button>
-        </div>
-        <div id="pvp-room-status"></div>
+    <!-- YOUR CODE — always visible, primary flow -->
+    <div id="pvp-room-box">
+      <div class="pvp-room-label">Your code — share this</div>
+      <div id="pvp-room-code-wrap">
+        <input type="text" id="pvp-room-code-input" maxlength="4" placeholder="1234" autocomplete="off" inputmode="numeric" pattern="[0-9]*" onkeydown="if(event.key==='Enter')pvpClaimCode()">
+        <button id="pvp-claim-btn" onclick="pvpClaimCode()">Set</button>
       </div>
-      <input type="text" id="pvp-target-id" placeholder="Enter opponent's code" autocomplete="off" inputmode="numeric" pattern="[0-9]*" onkeydown="if(event.key==='Enter')pvpManualChallenge()">
-      <button class="pvp-btn pvp-red" onclick="pvpManualChallenge()">[ Connect ]</button>
+      <div id="pvp-room-status"></div>
+      <button id="pvp-copy-btn" onclick="pvpCopyId()" style="margin-top:8px;background:transparent;border:1px solid rgba(255,220,0,0.3);color:#ffdc00;padding:6px 18px;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Courier New',monospace;touch-action:manipulation;">Copy Code</button>
     </div>
-    <button class="pvp-btn" onclick="closePvp()" style="margin-top:12px">[ Leave ]</button>
+    <!-- OPPONENT CODE — always visible -->
+    <div style="width:270px;margin:0 auto 6px;">
+      <div class="pvp-room-label" style="text-align:left;margin-bottom:4px;">Opponent's code</div>
+      <input type="text" id="pvp-target-id" placeholder="Enter their code" autocomplete="off" inputmode="numeric" pattern="[0-9]*" onkeydown="if(event.key==='Enter')pvpManualChallenge()" style="margin-bottom:6px;">
+      <button class="pvp-btn pvp-red" onclick="pvpManualChallenge()">[ Fight ]</button>
+    </div>
+    <div id="pvp-lobby-status" style="margin-top:4px;"></div>
+    <!-- PLAYER LIST — secondary, collapsible -->
+    <div id="pvp-manual-toggle" onclick="pvpToggleManual()">▸ See players online</div>
+    <div id="pvp-manual-body">
+      <div id="pvp-players-list"></div>
+    </div>
+    <button class="pvp-btn" onclick="closePvp()" style="margin-top:10px">[ Leave ]</button>
   </div>
   <!-- INCOMING CHALLENGE -->
   <div id="pvp-challenge-screen" style="display:none">
@@ -1779,7 +1786,7 @@ function pvpToggleManual(){
   const t=document.getElementById('pvp-manual-toggle');
   const open=b.style.display==='block';
   b.style.display=open?'none':'block';
-  t.textContent=open?'▸ Manual connect':'▾ Manual connect';
+  t.textContent=open?'▸ See players online':'▾ Hide player list';
 }
 
 function pvpSetRoomStatus(msg,color){
@@ -1789,7 +1796,7 @@ function pvpSetRoomStatus(msg,color){
 
 function pvpInitPeer(code,onSuccess,onTaken){
   if(PVP.peer){try{PVP.peer.destroy();}catch(e){}}PVP.peer=null;
-  const peer=new Peer('sz-'+code,{debug:0});PVP.peer=peer;
+  const peer=new Peer('sz-'+code,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]}});PVP.peer=peer;
   peer.on('open',id=>{
     PVP.myPeerId=id;PVP.myRoomCode=code;
     peer.on('connection',conn=>{
@@ -1876,7 +1883,7 @@ function pvpCopyId(){
 // ─ Lobby host logic ────────────────────────────────────────────────────
 function pvpTryBecomeHost(){
   if(PVP.hostPeer)return;
-  const hp=new Peer(LOBBY_ID,{debug:0});PVP.hostPeer=hp;
+  const hp=new Peer(LOBBY_ID,{debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]}});PVP.hostPeer=hp;
   hp.on('open',()=>{
     PVP.isLobbyHost=true;PVP.lobbyClients={};
     PVP.lobbyPlayers=[{name:PVP.myName,peerId:PVP.myPeerId}];
