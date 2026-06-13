@@ -563,11 +563,46 @@ for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){if(MAP[r][c]===1){const m=new THR
 (()=>{
   const rockH=WH*2.0;
   const rockMat=new THREE.MeshLambertMaterial({map:wallTex,color:0xe8e0d0});
-  const grassTex=makeTex('grass');grassTex.repeat.set(8,8);
-  const hillFloorMat=new THREE.MeshLambertMaterial({map:grassTex,color:0xddffdd});
-  const hFloor=new THREE.Mesh(new THREE.PlaneGeometry(COLS*CS,ROWS*CS),hillFloorMat);
-  hFloor.rotation.x=-Math.PI/2;hFloor.position.set(COLS*CS/2,0,ROWS*CS/2);hillsGroup.add(hFloor);
-  // Rock wall blocks (taller than bunker walls)
+
+  // ── Rolling hill terrain (vertex-displaced plane) ───────────────────
+  const grassTex=makeTex('grass');grassTex.repeat.set(10,10);
+  const hillMat=new THREE.MeshLambertMaterial({map:grassTex,color:0xddffdd});
+  const segs=52;
+  const terrGeo=new THREE.PlaneGeometry(COLS*CS,ROWS*CS,segs,segs);
+  terrGeo.rotateX(-Math.PI/2); // bakes flat XZ terrain into vertex buffer
+  // Hill definitions: [world_x, world_z, peak_height, gaussian_radius]
+  // World space: X 0-80, Z 0-80 (COLS*CS = ROWS*CS = 80, CS=4)
+  const hillDefs=[
+    [20,24,4.0,17],[58,22,3.0,14],[40,42,4.8,19],
+    [18,58,3.2,13],[62,60,3.5,15],[40,72,1.8,9],
+    [14,40,2.2,11],[66,44,2.6,11],[50,30,2.4,10],
+    [28,14,1.2,7],[30,52,2.8,12],[54,70,1.6,8],
+    [8,18,1.6,8],[72,28,2.0,9]
+  ];
+  const tHW=COLS*CS/2, tHD=ROWS*CS/2;
+  // Helper: sample terrain height at world (wx, wz)
+  function sampleH(wx,wz){
+    let h=0;
+    for(const [hx,hz,hh,hr] of hillDefs){
+      const d=Math.sqrt((wx-hx)**2+(wz-hz)**2);
+      h+=hh*Math.exp(-d*d/(hr*hr));
+    }
+    // Flatten near extraction zone (wz<14) and near back edge (wz>68)
+    const fe=Math.min(1,Math.max(0,(wz-6)/10));
+    const fs=Math.min(1,Math.max(0,(76-wz)/9));
+    return h*fe*fs;
+  }
+  const tp=terrGeo.attributes.position;
+  for(let i=0;i<tp.count;i++){
+    const wx=tp.getX(i)+tHW, wz=tp.getZ(i)+tHD;
+    tp.setY(i,sampleH(wx,wz));
+  }
+  terrGeo.computeVertexNormals();
+  const terrMesh=new THREE.Mesh(terrGeo,hillMat);
+  terrMesh.position.set(tHW,0,tHD);
+  hillsGroup.add(terrMesh);
+
+  // ── Concrete brick wall blocks ──────────────────────────────────────
   const rGeo=new THREE.BoxGeometry(CS,rockH,CS);
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
     if(HILLS_MAP[r][c]===1){
@@ -576,32 +611,30 @@ for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){if(MAP[r][c]===1){const m=new THR
       hillsGroup.add(m);hillsWallMeshes.push(m);
     }
   }
-  // Hill mounds — large raised platforms (visual, no collision)
-  [[5,5],[5,14],[10,10],[15,5],[15,14],[8,9]].forEach(([r,c])=>{
-    const hMat=new THREE.MeshBasicMaterial({color:0x4a8a28});
-    const h=new THREE.Mesh(new THREE.BoxGeometry(CS*3,1.4,CS*3),hMat);
-    h.position.set(c*CS,0.7,r*CS);hillsGroup.add(h);
-    const ht=new THREE.Mesh(new THREE.BoxGeometry(CS*1.8,1.0,CS*1.8),new THREE.MeshBasicMaterial({color:0x5a9a38}));
-    ht.position.set(c*CS,1.9,r*CS);hillsGroup.add(ht);
-  });
-  // Trees — trunk + canopy boxes
+
+  // ── Trees — planted on top of the terrain ───────────────────────────
   [[2,7],[2,13],[6,4],[6,15],[11,3],[11,16],[17,7],[17,12],[9,1],[9,18]].forEach(([r,c])=>{
-    const x=c*CS+CS/2,z=r*CS+CS/2;
-    const trunk=new THREE.Mesh(new THREE.BoxGeometry(0.3,1.4,0.3),new THREE.MeshBasicMaterial({color:0x5c3d1e}));
-    trunk.position.set(x,0.7,z);hillsGroup.add(trunk);
-    const canopy=new THREE.Mesh(new THREE.BoxGeometry(1.4,1.8,1.4),new THREE.MeshBasicMaterial({color:0x1a6b1a}));
-    canopy.position.set(x,2.1,z);hillsGroup.add(canopy);
+    const x=c*CS+CS/2, z=r*CS+CS/2;
+    const th=sampleH(x,z);
+    const trunk=new THREE.Mesh(new THREE.BoxGeometry(0.3,1.6,0.3),new THREE.MeshBasicMaterial({color:0x5c3d1e}));
+    trunk.position.set(x,th+0.8,z);hillsGroup.add(trunk);
+    const canopy=new THREE.Mesh(new THREE.BoxGeometry(1.6,2.0,1.6),new THREE.MeshBasicMaterial({color:0x1a6b1a}));
+    canopy.position.set(x,th+2.4,z);hillsGroup.add(canopy);
+    // Second canopy layer for fullness
+    const canopy2=new THREE.Mesh(new THREE.BoxGeometry(1.0,1.4,1.0),new THREE.MeshBasicMaterial({color:0x258025}));
+    canopy2.position.set(x,th+3.5,z);hillsGroup.add(canopy2);
   });
-  // Extraction zone beacon (glowing green pad — walk to it after 10 kills)
+
+  // ── Extraction zone ──────────────────────────────────────────────────
   const exMat=new THREE.MeshBasicMaterial({color:0x00ff66,transparent:true,opacity:0.45});
   const exPad=new THREE.Mesh(new THREE.PlaneGeometry(CS*2.5,CS*2.5),exMat);
   exPad.rotation.x=-Math.PI/2;exPad.position.set(COLS*CS/2,0.02,2*CS);hillsGroup.add(exPad);
   const exLight=new THREE.PointLight(0x00ff66,5,14);exLight.position.set(COLS*CS/2,2,2*CS);hillsGroup.add(exLight);
-  // Bright outdoor sun lights scattered across map
+
+  // ── Outdoor sunlights ────────────────────────────────────────────────
   [[4,4],[4,10],[4,16],[10,4],[10,16],[16,4],[16,10],[16,16]].forEach(([c,r])=>{
     const l=new THREE.PointLight(0xffffcc,3,40);l.position.set(c*CS,WH*3,r*CS);hillsGroup.add(l);
   });
-  // Store refs for pulsing and exit detection
   hillsGroup.userData.exLight=exLight;
   hillsGroup.userData.exX=COLS*CS/2;hillsGroup.userData.exZ=2*CS;
 })();
