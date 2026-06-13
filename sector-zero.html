@@ -300,8 +300,8 @@ body.touch-device .pvp-btn{touch-action:manipulation;}
     </div>
     <div id="pvp-lobby-status" style="margin-top:4px;"></div>
     <!-- PLAYER LIST — secondary, collapsible -->
-    <div id="pvp-manual-toggle" onclick="pvpToggleManual()">▸ See players online</div>
-    <div id="pvp-manual-body">
+    <div id="pvp-manual-toggle" onclick="pvpToggleManual()">▾ Hide player list</div>
+    <div id="pvp-manual-body" style="display:block">
       <div id="pvp-players-list"></div>
     </div>
     <button class="pvp-btn" onclick="closePvp()" style="margin-top:10px">[ Leave ]</button>
@@ -1789,6 +1789,7 @@ function pvpToggleManual(){
   t.textContent=open?'▸ See players online':'▾ Hide player list';
 }
 
+
 function pvpSetRoomStatus(msg,color){
   const el=document.getElementById('pvp-room-status');
   if(el){el.textContent=msg;el.style.color=color||'#666';}
@@ -1900,18 +1901,27 @@ function pvpTryBecomeHost(){
 }
 
 function pvpHandleNewClient(conn){
-  PVP.lobbyClients[conn.peer]={conn,name:'?'};
+  // Wire up data listener FIRST before anything else to avoid race
   conn.on('data',d=>pvpHostOnData(conn,d));
   conn.on('close',()=>{
     delete PVP.lobbyClients[conn.peer];
     pvpHostRebuildAndBroadcast();
   });
+  conn.on('open',()=>{
+    // Add client and broadcast immediately so host list updates right away
+    if(!PVP.lobbyClients[conn.peer])PVP.lobbyClients[conn.peer]={conn,name:'?'};
+    pvpHostRebuildAndBroadcast();
+    // Ask client to re-register in case their register message beat our listener
+    conn.send({type:'request_register'});
+  });
+  // Also add on connection event in case open already fired
+  PVP.lobbyClients[conn.peer]={conn,name:'?'};
 }
 
 function pvpHostOnData(conn,d){
   switch(d.type){
     case 'register':
-      PVP.lobbyClients[conn.peer]={conn,name:d.name};
+      PVP.lobbyClients[conn.peer]={conn,name:d.name||PVP.lobbyClients[conn.peer]?.name||'?'};
       pvpHostRebuildAndBroadcast();
       break;
     case 'challenge':{
@@ -1973,19 +1983,33 @@ function pvpHostRebuildAndBroadcast(){
 // ─ Lobby client logic ──────────────────────────────────────────────────
 function pvpJoinAsClient(){
   if(!PVP.peer||PVP.lobbyConn)return;
-  const conn=PVP.peer.connect(LOBBY_ID,{reliable:true});
+  const conn=PVP.peer.connect(LOBBY_ID,{reliable:true,serialization:'json'});
   PVP.lobbyConn=conn;
+  let registered=false;
+  let regInterval=null;
+  function sendRegister(){
+    if(!registered&&conn.open)conn.send({type:'register',name:PVP.myName,peerId:PVP.myPeerId});
+  }
   conn.on('open',()=>{
-    conn.send({type:'register',name:PVP.myName,peerId:PVP.myPeerId});
+    sendRegister();
+    // Retry every 2s until we get a player_list confirming registration
+    regInterval=setInterval(sendRegister,2000);
     document.getElementById('pvp-lobby-status').textContent='Online';
   });
-  conn.on('data',pvpClientOnData);
+  conn.on('data',d=>{
+    if(d.type==='player_list'){registered=true;clearInterval(regInterval);}
+    if(d.type==='request_register'){sendRegister();}
+    pvpClientOnData(d);
+  });
   conn.on('close',()=>{
+    clearInterval(regInterval);
     PVP.lobbyConn=null;
     document.getElementById('pvp-lobby-status').textContent='Reconnecting...';
     setTimeout(pvpTryBecomeHost,1500);
   });
-  conn.on('error',()=>{PVP.lobbyConn=null;setTimeout(pvpJoinAsClient,2000);});
+  conn.on('error',()=>{clearInterval(regInterval);PVP.lobbyConn=null;setTimeout(pvpJoinAsClient,2000);});
+  // Timeout: if open hasn't fired in 8s, retry from scratch
+  setTimeout(()=>{if(!conn.open){PVP.lobbyConn=null;pvpJoinAsClient();}},8000);
 }
 
 function pvpClientOnData(d){
