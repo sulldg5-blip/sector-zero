@@ -55,10 +55,7 @@ body{background:#000;overflow:hidden;font-family:'Courier New',monospace;}
 #shield-value{font-size:18px;font-weight:bold;color:#44ccff;text-shadow:0 0 8px rgba(0,200,255,.5);}
 
 /* ── MOBILE CONTROLS ── */
-#portrait-warn{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.97);z-index:9999;align-items:center;justify-content:center;flex-direction:column;color:#fff;font-family:'Courier New',monospace;text-align:center;}
-#portrait-warn.show{display:flex;}
-.pw-icon{font-size:52px;margin-bottom:22px;}
-.pw-text{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#555;line-height:2.2;}
+#portrait-warn{display:none!important;}
 #mobile-hud{display:none;position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:50;}
 body.touch-device #mobile-hud{display:block;}
 #joy-zone{position:absolute;left:0;bottom:0;width:44%;height:62%;pointer-events:all;touch-action:none;}
@@ -1380,10 +1377,7 @@ document.addEventListener('pointerlockchange',()=>{G.mouse.locked=document.point
 const IS_TOUCH='ontouchstart' in window||navigator.maxTouchPoints>0;
 if(IS_TOUCH){document.body.classList.add('touch-device');G.mouse.locked=true;}
 
-function checkOrient(){
-  const pw=document.getElementById('portrait-warn');
-  if(IS_TOUCH)pw.classList.toggle('show',window.innerHeight>window.innerWidth);
-}
+function checkOrient(){}
 window.addEventListener('orientationchange',()=>setTimeout(checkOrient,150));
 checkOrient();
 
