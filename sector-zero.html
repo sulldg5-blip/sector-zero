@@ -537,7 +537,7 @@ for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){if(MAP[r][c]===1){const m=new THR
 // ─── HILLS ENVIRONMENT (built once, toggled visible) ─────────────────
 (()=>{
   const rockH=WH*2.0;
-  const rockMat=new THREE.MeshLambertMaterial({map:rockTex,color:0xccbbaa});
+  const rockMat=new THREE.MeshLambertMaterial({map:wallTex,color:0x9a8a78});
   const hillFloorMat=new THREE.MeshLambertMaterial({color:0x3a7020});
   const hFloor=new THREE.Mesh(new THREE.PlaneGeometry(COLS*CS,ROWS*CS),hillFloorMat);
   hFloor.rotation.x=-Math.PI/2;hFloor.position.set(COLS*CS/2,0,ROWS*CS/2);hillsGroup.add(hFloor);
@@ -640,25 +640,51 @@ function pickupWeaponFloor(type){
 function makeEnemyMesh(gunColor,gunTier){
   gunColor=gunColor||0x555555;gunTier=gunTier||1;
   const g=new THREE.Group(),lm=c=>new THREE.MeshLambertMaterial({color:c});
+  // Legs — olive drab military trousers
   const lL=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.55,0.18),lm(0x3a4a2a));lL.position.set(-0.13,0.28,0);g.add(lL);
   const rL=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.55,0.18),lm(0x3a4a2a));rL.position.set(0.13,0.28,0);g.add(rL);
-  const lB=new THREE.Mesh(new THREE.BoxGeometry(0.20,0.12,0.26),lm(0x1a1a1a));lB.position.set(-0.13,0.05,0.04);g.add(lB);
-  const rB=new THREE.Mesh(new THREE.BoxGeometry(0.20,0.12,0.26),lm(0x1a1a1a));rB.position.set(0.13,0.05,0.04);g.add(rB);
+  // Cargo pockets on thighs
+  const lCargo=new THREE.Mesh(new THREE.BoxGeometry(0.10,0.12,0.10),lm(0x2e3c22));lCargo.position.set(-0.15,0.22,0.10);g.add(lCargo);
+  const rCargo=new THREE.Mesh(new THREE.BoxGeometry(0.10,0.12,0.10),lm(0x2e3c22));rCargo.position.set(0.15,0.22,0.10);g.add(rCargo);
+  // Knee pads
+  const lKP=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.10,0.12),lm(0x1a1e12));lKP.position.set(-0.13,0.10,0.08);g.add(lKP);
+  const rKP=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.10,0.12),lm(0x1a1e12));rKP.position.set(0.13,0.10,0.08);g.add(rKP);
+  // Combat boots — dark brown
+  const lB=new THREE.Mesh(new THREE.BoxGeometry(0.20,0.12,0.26),lm(0x3d2a1a));lB.position.set(-0.13,0.05,0.04);g.add(lB);
+  const rB=new THREE.Mesh(new THREE.BoxGeometry(0.20,0.12,0.26),lm(0x3d2a1a));rB.position.set(0.13,0.05,0.04);g.add(rB);
+  // Belt with buckle
+  const belt=new THREE.Mesh(new THREE.BoxGeometry(0.54,0.07,0.22),lm(0x1a1a10));belt.position.set(0,0.58,0);g.add(belt);
+  const buckle=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.06,0.06),lm(0x888870));buckle.position.set(0,0.58,0.12);g.add(buckle);
+  // Torso — military uniform jacket
   const tor=new THREE.Mesh(new THREE.BoxGeometry(0.52,0.60,0.30),lm(0x4a5a3a));tor.position.set(0,0.87,0);g.add(tor);
+  // Tactical vest
   const vest=new THREE.Mesh(new THREE.BoxGeometry(0.56,0.42,0.22),lm(0x2a3a2a));vest.position.set(0,0.93,0.05);g.add(vest);
-  const p1=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.12,0.08),lm(0x3a4a2a));p1.position.set(-0.22,0.85,0.14);g.add(p1);
-  const p2=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.12,0.08),lm(0x3a4a2a));p2.position.set(0.22,0.85,0.14);g.add(p2);
+  // Chest rig ammo pouches
+  const ap1=new THREE.Mesh(new THREE.BoxGeometry(0.10,0.14,0.08),lm(0x1e2a1a));ap1.position.set(-0.14,1.02,0.17);g.add(ap1);
+  const ap2=new THREE.Mesh(new THREE.BoxGeometry(0.10,0.14,0.08),lm(0x1e2a1a));ap2.position.set(-0.02,1.02,0.17);g.add(ap2);
+  const ap3=new THREE.Mesh(new THREE.BoxGeometry(0.10,0.14,0.08),lm(0x1e2a1a));ap3.position.set(0.12,1.02,0.17);g.add(ap3);
+  // Side pockets
+  const p1=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.12,0.08),lm(0x1e2a1a));p1.position.set(-0.22,0.85,0.14);g.add(p1);
+  const p2=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.12,0.08),lm(0x1e2a1a));p2.position.set(0.22,0.85,0.14);g.add(p2);
+  // Backpack
+  const bp=new THREE.Mesh(new THREE.BoxGeometry(0.30,0.36,0.14),lm(0x2a3820));bp.position.set(0,0.96,-0.20);g.add(bp);
+  // Arms
   const lSh=new THREE.Group();lSh.position.set(-0.30,1.14,0);g.add(lSh);
   const lUA=new THREE.Mesh(new THREE.BoxGeometry(0.15,0.34,0.18),lm(0x4a5a3a));lUA.position.y=-0.17;lSh.add(lUA);
-  const lFA=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.30,0.14),lm(0x9a8a7a));lFA.position.y=-0.49;lSh.add(lFA);
+  const lFA=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.30,0.14),lm(0x1e1a16));lFA.position.y=-0.49;lSh.add(lFA);// tactical gloves
   const rSh=new THREE.Group();rSh.position.set(0.30,1.14,0);g.add(rSh);
   const rUA=new THREE.Mesh(new THREE.BoxGeometry(0.15,0.34,0.18),lm(0x4a5a3a));rUA.position.y=-0.17;rSh.add(rUA);
-  const rFA=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.30,0.14),lm(0x9a8a7a));rFA.position.y=-0.49;rSh.add(rFA);
+  const rFA=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.30,0.14),lm(0x1e1a16));rFA.position.y=-0.49;rSh.add(rFA);// tactical gloves
+  // Neck + head
   const neck=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.12,0.16),lm(0x9a8a7a));neck.position.set(0,1.22,0);g.add(neck);
   const head=new THREE.Mesh(new THREE.BoxGeometry(0.40,0.42,0.38),lm(0x9a8a7a));head.position.set(0,1.50,0);g.add(head);
+  // Balaclava covering lower face
   const bala=new THREE.Mesh(new THREE.BoxGeometry(0.40,0.20,0.38),lm(0x2a2a2a));bala.position.set(0,1.38,0);g.add(bala);
+  // Helmet with net cover texture feel
   const helm=new THREE.Mesh(new THREE.BoxGeometry(0.46,0.22,0.46),lm(0x3a4a2a));helm.position.set(0,1.67,0);g.add(helm);
-  const gg=new THREE.Mesh(new THREE.BoxGeometry(0.36,0.10,0.08),lm(0xffcc44));gg.position.set(0,1.54,0.20);g.add(gg);
+  const helmRim=new THREE.Mesh(new THREE.BoxGeometry(0.50,0.04,0.50),lm(0x2a3820));helmRim.position.set(0,1.57,0);g.add(helmRim);
+  // Goggles — tinted green NVG-style
+  const gg=new THREE.Mesh(new THREE.BoxGeometry(0.36,0.10,0.08),lm(0x2a4a2a));gg.position.set(0,1.54,0.20);g.add(gg);
   // Gun — size and color scale with tier
   const gLen=[0.38,0.50,0.58,0.68,0.78][Math.min(gunTier-1,4)];
   const gH=[0.06,0.07,0.08,0.10,0.12][Math.min(gunTier-1,4)];
@@ -965,10 +991,10 @@ function updateEnemy(e,dt){
   e.walkT+=dt;
   if(e.mesh.userData.lSh){e.mesh.userData.lSh.rotation.x=Math.sin(e.walkT*4)*0.4;e.mesh.userData.rSh.rotation.x=-Math.sin(e.walkT*4)*0.4;e.mesh.userData.lL.rotation.x=-Math.sin(e.walkT*4)*0.25;e.mesh.userData.rL.rotation.x=Math.sin(e.walkT*4)*0.25;}
   switch(e.state){
-    case 'patrol':{if(dist<e.detRange){if(!e.alerted){e.alerted=true;SFX.alerted();}e.state='chase';break;}const tgt=e.patrolPts[e.patrolIdx];const toT=new THREE.Vector3().subVectors(tgt,e.pos);toT.y=0;if(toT.length()<0.6){e.patrolIdx=(e.patrolIdx+1)%e.patrolPts.length;e.patrolWait=1000;}else if(e.patrolWait>0)e.patrolWait-=dt*1000;else{const d=toT.normalize();e.pos.copy(moveCol(e.pos,d.x*e.speed*0.4*dt,d.z*e.speed*0.4*dt,0.3));e.mesh.rotation.y=Math.atan2(d.x,d.z);}break;}
-    case 'seek_cover':{if(!e.coverPos){e.state='chase';break;}const toC=new THREE.Vector3().subVectors(e.coverPos,e.pos);toC.y=0;if(toC.length()<0.5){e.state='cover';const cwMax=G.levelCfg.coverWaitMax||1.0;e.coverWait=cwMax*0.3+Math.random()*cwMax*0.7;break;}const d=toC.normalize();e.pos.copy(moveCol(e.pos,d.x*e.speed*1.2*dt,d.z*e.speed*1.2*dt,0.3));e.mesh.rotation.y=Math.atan2(d.x,d.z);break;}
+    case 'patrol':{if(dist<e.detRange){if(!e.alerted){e.alerted=true;SFX.alerted();}e.state='chase';break;}const tgt=e.patrolPts[e.patrolIdx];const toT=new THREE.Vector3().subVectors(tgt,e.pos);toT.y=0;if(toT.length()<0.6){e.patrolIdx=(e.patrolIdx+1)%e.patrolPts.length;e.patrolWait=1000;}else if(e.patrolWait>0)e.patrolWait-=dt*1000;else{const d=toT.normalize();e.pos.copy(moveCol(e.pos,d.x*e.speed*0.4*dt,d.z*e.speed*0.4*dt,e.isBoss?0.65:0.3));e.mesh.rotation.y=Math.atan2(d.x,d.z);}break;}
+    case 'seek_cover':{if(!e.coverPos){e.state='chase';break;}const toC=new THREE.Vector3().subVectors(e.coverPos,e.pos);toC.y=0;if(toC.length()<0.5){e.state='cover';const cwMax=G.levelCfg.coverWaitMax||1.0;e.coverWait=cwMax*0.3+Math.random()*cwMax*0.7;break;}const d=toC.normalize();e.pos.copy(moveCol(e.pos,d.x*e.speed*1.2*dt,d.z*e.speed*1.2*dt,e.isBoss?0.65:0.3));e.mesh.rotation.y=Math.atan2(d.x,d.z);break;}
     case 'cover':{e.coverWait-=dt;const d=toP.normalize();e.mesh.rotation.y=Math.atan2(d.x,d.z);if(e.coverWait<=0){if(dist<e.atkRange){const sp=e.pos.clone().setY(1.0);const sp2=G.levelCfg.aimSpread;const aim=new THREE.Vector3().subVectors(cam.position,sp).normalize();aim.x+=(Math.random()-.5)*sp2;aim.y+=(Math.random()-.5)*sp2*0.5;aim.z+=(Math.random()-.5)*sp2;G.projectiles.push(makeProjectile(sp,aim,true,false,e.isBoss));}if(Math.random()>0.55&&dist>e.atkRange*0.6){const cov=findCover(e.pos,cam.position);if(cov){e.coverPos=cov;e.state='seek_cover';}else e.state='attack';}else e.state='attack';}break;}
-    case 'chase':{if(dist>e.detRange*1.6){e.state='patrol';break;}if(dist<e.atkRange){e.state='attack';break;}const d=toP.normalize();e.pos.copy(moveCol(e.pos,d.x*e.speed*dt,d.z*e.speed*dt,0.3));e.mesh.rotation.y=Math.atan2(d.x,d.z);if(Math.random()<0.003){const cov=findCover(e.pos,cam.position);if(cov){e.coverPos=cov;e.state='seek_cover';}}break;}
+    case 'chase':{if(dist>e.detRange*1.6){e.state='patrol';break;}if(dist<e.atkRange){e.state='attack';break;}const d=toP.normalize();e.pos.copy(moveCol(e.pos,d.x*e.speed*dt,d.z*e.speed*dt,e.isBoss?0.65:0.3));e.mesh.rotation.y=Math.atan2(d.x,d.z);if(Math.random()<0.003){const cov=findCover(e.pos,cam.position);if(cov){e.coverPos=cov;e.state='seek_cover';}}break;}
     case 'attack':{
       if(dist>e.atkRange*1.4){e.state='chase';break;}
       const d=toP.normalize();e.mesh.rotation.y=Math.atan2(d.x,d.z);
@@ -979,10 +1005,10 @@ function updateEnemy(e,dt){
       }
       if(e.charging>0){
         e.charging-=dt;const spd=e.isBoss?e.speed*2.8:e.speed*1.8;
-        e.pos.copy(moveCol(e.pos,d.x*spd*dt,d.z*spd*dt,0.3));
+        e.pos.copy(moveCol(e.pos,d.x*spd*dt,d.z*spd*dt,e.isBoss?0.65:0.3));
       } else {
         const str=new THREE.Vector3(-d.z,0,d.x).multiplyScalar(Math.sin(Date.now()*0.0009+e.mesh.id)*e.speed*0.35*dt);
-        e.pos.copy(moveCol(e.pos,str.x,str.z,0.3));
+        e.pos.copy(moveCol(e.pos,str.x,str.z,e.isBoss?0.65:0.3));
       }
       e.atkCd-=dt*1000;
       if(e.atkCd<=0){
@@ -1003,6 +1029,15 @@ function updateEnemy(e,dt){
     }
   }
   e.mesh.position.copy(e.pos);
+  // Boss push-out: if somehow inside a wall, eject to safe position
+  if(e.isBoss){
+    const bRad=0.65;
+    if(isWall(e.pos.x+bRad,e.pos.z))e.pos.x=Math.floor((e.pos.x+bRad)/CS)*CS-bRad-0.02;
+    if(isWall(e.pos.x-bRad,e.pos.z))e.pos.x=Math.ceil((e.pos.x-bRad)/CS)*CS+bRad+0.02;
+    if(isWall(e.pos.x,e.pos.z+bRad))e.pos.z=Math.floor((e.pos.z+bRad)/CS)*CS-bRad-0.02;
+    if(isWall(e.pos.x,e.pos.z-bRad))e.pos.z=Math.ceil((e.pos.z-bRad)/CS)*CS+bRad+0.02;
+    e.mesh.position.copy(e.pos);
+  }
 }
 
 function updateProjectiles(dt){
