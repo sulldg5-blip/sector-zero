@@ -71,6 +71,12 @@ body.touch-device #mobile-hud{display:block;}
 #btn-sprint{left:18px;bottom:190px;}
 #btn-crouch{left:90px;bottom:190px;}
 #btn-sprint.on,#btn-crouch.on{border-color:rgba(255,255,255,0.55);color:#fff;}
+#btn-fullscreen{position:absolute;top:14px;right:14px;width:40px;height:40px;pointer-events:all;touch-action:none;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.28);border-radius:6px;color:#bbb;font-size:18px;display:flex;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;cursor:pointer;}
+/* Mobile overlay tweaks */
+body.touch-device #overlay h1{font-size:34px;letter-spacing:5px;}
+body.touch-device #overlay .desktop-info{display:none;}
+body.touch-device #overlay .mobile-info{display:block !important;}
+body.touch-device #overlay button{font-size:17px;padding:18px 64px;border-width:2px;letter-spacing:5px;margin-top:8px;}
 
 /* ── OVERLAY (start / pause / win) ── */
 #overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.88);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;color:#fff;}
@@ -159,10 +165,17 @@ body.touch-device #mobile-hud{display:block;}
 <div id="overlay">
   <h1>Sector Zero</h1>
   <div class="sub">Tactical Shooter — Offline</div>
-  <div class="info">
+  <div class="info desktop-info">
     <span style="color:#aaa">W A S D</span> — Move &nbsp;|&nbsp; <span style="color:#aaa">Mouse</span> — Aim<br>
     <span style="color:#aaa">Click</span> — Fire &nbsp;|&nbsp; <span style="color:#aaa">R</span> — Reload &nbsp;|&nbsp; <span style="color:#aaa">Shift</span> — Sprint<br>
     <span style="color:#aaa">Space</span> — Jump &nbsp;|&nbsp; <span style="color:#aaa">Ctrl</span> — Crouch<br><br>
+    <span style="color:#ffdc00">Each kill earns coins. Spend them in the shop when you die.</span><br>
+    <span style="color:#44ccff">Levels 1-2: Bunker — get the key &amp; escape.<br>Level 3+: Hills — kill 10 enemies then reach extraction.</span>
+  </div>
+  <div class="info mobile-info" style="display:none">
+    <span style="color:#aaa">Left thumb</span> — Move &nbsp;|&nbsp; <span style="color:#aaa">Right side</span> — Aim<br>
+    <span style="color:#ff4136">FIRE</span> — Shoot &nbsp;|&nbsp; <span style="color:#aaa">JUMP</span> — Jump &nbsp;|&nbsp; <span style="color:#ffdc00">RELOAD</span> — Reload<br>
+    <span style="color:#aaa">SPRINT</span> — Run &nbsp;|&nbsp; <span style="color:#aaa">DUCK</span> — Crouch<br><br>
     <span style="color:#ffdc00">Each kill earns coins. Spend them in the shop when you die.</span><br>
     <span style="color:#44ccff">Levels 1-2: Bunker — get the key &amp; escape.<br>Level 3+: Hills — kill 10 enemies then reach extraction.</span>
   </div>
@@ -199,6 +212,7 @@ body.touch-device #mobile-hud{display:block;}
   <div class="mb-btn" id="btn-reload">RELOAD</div>
   <div id="btn-sprint">SPRINT</div>
   <div id="btn-crouch">DUCK</div>
+  <div id="btn-fullscreen">⛶</div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -1387,9 +1401,32 @@ function loop(ts){
   renderer.render(scene,cam);requestAnimationFrame(loop);
 }
 
+// ─── FULLSCREEN (mobile) ─────────────────────────────────────────────
+function tryFullscreen(){
+  const el=document.documentElement;
+  const req=el.requestFullscreen||el.webkitRequestFullscreen||el.mozRequestFullScreen;
+  if(req)req.call(el).catch(()=>{});
+}
+function exitFullscreen(){
+  const ex=document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen;
+  if(ex)ex.call(document).catch(()=>{});
+}
+const btnFs=document.getElementById('btn-fullscreen');
+if(btnFs){
+  btnFs.addEventListener('touchstart',e=>{
+    e.preventDefault();e.stopPropagation();
+    if(document.fullscreenElement||document.webkitFullscreenElement){exitFullscreen();btnFs.textContent='⛶';}
+    else{tryFullscreen();btnFs.textContent='⛞';}
+  },{passive:false});
+  const onFsChange=()=>{const full=!!(document.fullscreenElement||document.webkitFullscreenElement);btnFs.textContent=full?'⛞':'⛶';};
+  document.addEventListener('fullscreenchange',onFsChange);
+  document.addEventListener('webkitfullscreenchange',onFsChange);
+}
+
 // ─── BOOT ────────────────────────────────────────────────────────────
 document.getElementById('start-btn').addEventListener('click',()=>{
   document.getElementById('overlay').classList.add('hidden');
+  if(IS_TOUCH)tryFullscreen();
   initGame();G.running=true;G.paused=false;G.lastTime=performance.now();
   if(!IS_TOUCH)canvas.requestPointerLock();else G.mouse.locked=true;
   const cfg=G.levelCfg;
