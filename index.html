@@ -137,6 +137,25 @@ body.pvp-active #pvp-score-hud{display:block;}
 .pvp-btn-row .pvp-btn{flex:1;margin:0;}
 /* waiting screen */
 #pvp-wait-label{font-size:13px;letter-spacing:3px;color:#aaa;text-align:center;margin-bottom:22px;}
+/* ── Mobile PvP tweaks ── */
+body.touch-device #pvp-overlay{justify-content:flex-start;padding:20px 0 40px;overflow-y:auto;}
+body.touch-device #pvp-overlay input[type=text]{font-size:16px;padding:14px 16px;width:calc(100% - 40px);max-width:300px;}
+body.touch-device #pvp-room-code-input{font-size:20px;width:80px;}
+body.touch-device .pvp-btn{padding:16px 0;font-size:13px;width:calc(100% - 40px);max-width:300px;}
+body.touch-device .pvp-btn-row{width:calc(100% - 40px);max-width:300px;}
+body.touch-device .pvp-player-row{padding:14px 14px;}
+body.touch-device .pvp-player-row .chbtn{padding:10px 14px;font-size:10px;}
+body.touch-device #pvp-players-list{max-height:none;width:calc(100% - 20px);max-width:320px;}
+body.touch-device #pvp-manual-toggle{padding:10px 0;font-size:10px;}
+body.touch-device #pvp-manual-body{width:calc(100% - 40px);max-width:290px;}
+body.touch-device #pvp-room-box{width:100%;box-sizing:border-box;}
+body.touch-device #pvp-challenger-name{font-size:28px;}
+/* In-game 1v1 button for mobile HUD */
+#btn-pvp{position:absolute;top:14px;right:62px;width:40px;height:40px;pointer-events:all;touch-action:manipulation;background:rgba(255,65,54,0.18);border:1px solid rgba(255,65,54,0.5);border-radius:6px;color:#ff4136;font-size:10px;letter-spacing:1px;display:flex;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;cursor:pointer;font-family:'Courier New',monospace;}
+body.pvp-active #btn-pvp{display:none;}
+body.touch-device .pvp-player-row .chbtn{touch-action:manipulation;padding:12px 16px;font-size:11px;}
+body.touch-device .pvp-btn-row .pvp-btn{touch-action:manipulation;}
+body.touch-device .pvp-btn{touch-action:manipulation;}
 
 /* ── OVERLAY (start / pause / win) ── */
 #overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.88);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;color:#fff;}
@@ -273,12 +292,12 @@ body.pvp-active #pvp-score-hud{display:block;}
       <div id="pvp-room-box">
         <div class="pvp-room-label">Your room code</div>
         <div id="pvp-room-code-wrap">
-          <input type="text" id="pvp-room-code-input" maxlength="4" placeholder="1234" autocomplete="off" onkeydown="if(event.key==='Enter')pvpClaimCode()">
+          <input type="text" id="pvp-room-code-input" maxlength="4" placeholder="1234" autocomplete="off" inputmode="numeric" pattern="[0-9]*" onkeydown="if(event.key==='Enter')pvpClaimCode()">
           <button id="pvp-claim-btn" onclick="pvpClaimCode()">Set</button>
         </div>
         <div id="pvp-room-status"></div>
       </div>
-      <input type="text" id="pvp-target-id" placeholder="Enter opponent's code" autocomplete="off" onkeydown="if(event.key==='Enter')pvpManualChallenge()">
+      <input type="text" id="pvp-target-id" placeholder="Enter opponent's code" autocomplete="off" inputmode="numeric" pattern="[0-9]*" onkeydown="if(event.key==='Enter')pvpManualChallenge()">
       <button class="pvp-btn pvp-red" onclick="pvpManualChallenge()">[ Connect ]</button>
     </div>
     <button class="pvp-btn" onclick="closePvp()" style="margin-top:12px">[ Leave ]</button>
@@ -321,6 +340,7 @@ body.pvp-active #pvp-score-hud{display:block;}
   <div id="btn-sprint">SPRINT</div>
   <div id="btn-crouch">DUCK</div>
   <div id="btn-fullscreen">⛶</div>
+  <div id="btn-pvp" onclick="openPvp()">1v1</div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
