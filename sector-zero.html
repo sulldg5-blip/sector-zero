@@ -82,7 +82,7 @@ body.touch-device #overlay button{font-size:17px;padding:18px 64px;border-width:
 #pvp-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.96);z-index:300;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:'Courier New',monospace;}
 #pvp-overlay.show{display:flex;}
 #pvp-overlay h2{font-size:24px;letter-spacing:7px;text-transform:uppercase;margin-bottom:6px;color:#ff4136;}
-#pvp-overlay .pvp-sub{font-size:9px;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:26px;}
+#pvp-overlay .pvp-sub{font-size:9px;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:20px;}
 #pvp-overlay input[type=text]{display:block;width:270px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.22);color:#fff;padding:12px 16px;font-size:14px;font-family:'Courier New',monospace;letter-spacing:3px;margin:0 auto 14px;text-align:center;}
 #pvp-overlay input[type=text]:focus{outline:none;border-color:rgba(255,65,54,0.7);}
 #pvp-overlay input[type=text]::placeholder{color:#444;letter-spacing:1px;}
@@ -90,15 +90,39 @@ body.touch-device #overlay button{font-size:17px;padding:18px 64px;border-width:
 .pvp-btn:hover{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.6);color:#fff;}
 .pvp-btn.pvp-red{border-color:rgba(255,65,54,0.55);color:#ff4136;}
 .pvp-btn.pvp-red:hover{background:rgba(255,65,54,0.12);border-color:rgba(255,65,54,0.9);}
-#pvp-room-box{background:rgba(255,220,0,0.05);border:1px solid rgba(255,220,0,0.25);padding:14px 24px;margin:0 auto 20px;width:270px;text-align:center;box-sizing:border-box;}
-.pvp-room-label{font-size:8px;letter-spacing:3px;color:#666;text-transform:uppercase;margin-bottom:8px;}
-#pvp-room-code{font-size:20px;font-weight:bold;letter-spacing:5px;color:#ffdc00;cursor:pointer;user-select:all;}
-#pvp-status{font-size:9px;letter-spacing:2px;color:#555;text-align:center;margin-bottom:18px;min-height:14px;}
+#pvp-room-box{background:rgba(255,220,0,0.05);border:1px solid rgba(255,220,0,0.25);padding:10px 24px;margin:0 auto 10px;width:270px;text-align:center;box-sizing:border-box;}
+.pvp-room-label{font-size:8px;letter-spacing:3px;color:#666;text-transform:uppercase;margin-bottom:6px;}
+#pvp-room-code{font-size:15px;font-weight:bold;letter-spacing:3px;color:#ffdc00;cursor:pointer;user-select:all;}
+#pvp-status{font-size:9px;letter-spacing:2px;color:#555;text-align:center;margin-bottom:14px;min-height:14px;}
 #pvp-opp-label{display:block;font-size:20px;letter-spacing:4px;color:#fff;text-align:center;margin-bottom:20px;}
 #pvp-score-hud{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:60;display:none;background:rgba(0,0,0,0.75);border:1px solid rgba(255,255,255,0.12);padding:7px 24px;font-family:'Courier New',monospace;font-size:12px;letter-spacing:3px;color:#fff;pointer-events:none;white-space:nowrap;}
 body.pvp-active #pvp-score-hud{display:block;}
 #pvp-open-btn{margin-top:10px;border-color:rgba(255,65,54,0.45)!important;color:#ff4136!important;}
 #pvp-open-btn:hover{background:rgba(255,65,54,0.1)!important;border-color:rgba(255,65,54,0.8)!important;}
+/* player list */
+#pvp-players-list{width:300px;max-height:200px;overflow-y:auto;margin:0 auto 12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.02);}
+#pvp-players-list:empty::after{content:'No players online yet...';display:block;padding:16px;font-size:9px;letter-spacing:2px;color:#444;text-align:center;}
+.pvp-player-row{display:flex;align-items:center;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.06);cursor:default;transition:background .15s;}
+.pvp-player-row:last-child{border-bottom:none;}
+.pvp-player-row.pvp-other:hover{background:rgba(255,65,54,0.07);cursor:pointer;}
+.pvp-player-row .dot{width:6px;height:6px;background:#2ecc40;border-radius:50%;margin-right:10px;flex-shrink:0;box-shadow:0 0 4px #2ecc40;}
+.pvp-player-row .pname{flex:1;font-size:12px;letter-spacing:2px;color:#ddd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pvp-player-row .me-tag{font-size:8px;color:#444;letter-spacing:1px;}
+.pvp-player-row .chbtn{background:rgba(255,65,54,0.1);border:1px solid rgba(255,65,54,0.4);color:#ff4136;padding:4px 10px;font-size:8px;letter-spacing:2px;cursor:pointer;font-family:'Courier New',monospace;transition:all .15s;white-space:nowrap;}
+.pvp-player-row .chbtn:hover{background:rgba(255,65,54,0.25);border-color:rgba(255,65,54,0.9);}
+#pvp-lobby-status{font-size:9px;letter-spacing:2px;color:#555;text-align:center;margin-bottom:10px;}
+/* manual connect toggle */
+#pvp-manual-toggle{font-size:9px;letter-spacing:2px;color:#333;text-align:center;margin-bottom:8px;cursor:pointer;padding:4px 0;border-top:1px solid rgba(255,255,255,0.06);width:300px;}
+#pvp-manual-toggle:hover{color:#555;}
+#pvp-manual-body{display:none;width:270px;margin:0 auto;}
+/* challenge incoming */
+#pvp-challenge-screen{text-align:center;}
+#pvp-challenger-name{display:block;font-size:22px;letter-spacing:5px;color:#ffdc00;margin-bottom:6px;}
+.pvp-wants-msg{font-size:9px;color:#555;letter-spacing:2px;margin-bottom:22px;}
+.pvp-btn-row{display:flex;gap:10px;width:270px;margin:0 auto;}
+.pvp-btn-row .pvp-btn{flex:1;margin:0;}
+/* waiting screen */
+#pvp-wait-label{font-size:13px;letter-spacing:3px;color:#aaa;text-align:center;margin-bottom:22px;}
 
 /* ── OVERLAY (start / pause / win) ── */
 #overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.88);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;color:#fff;}
@@ -226,17 +250,37 @@ body.pvp-active #pvp-score-hud{display:block;}
     <h2>1v1 MODE</h2>
     <div class="pvp-sub">Set your callsign before entering the arena</div>
     <input type="text" id="pvp-name-input" placeholder="Callsign..." maxlength="16" autocomplete="off" onkeydown="if(event.key==='Enter')pvpConfirmName()">
-    <button class="pvp-btn pvp-red" onclick="pvpConfirmName()">[ Confirm Callsign ]</button>
+    <button class="pvp-btn pvp-red" onclick="pvpConfirmName()">[ Enter Lobby ]</button>
     <button class="pvp-btn" onclick="closePvp()">[ Cancel ]</button>
   </div>
   <div id="pvp-lobby-screen" style="display:none">
     <h2>1v1 LOBBY</h2>
-    <div class="pvp-sub">Share your room ID — or enter theirs to challenge</div>
-    <div id="pvp-room-box"><div class="pvp-room-label">Your Room ID (tap to copy)</div><div id="pvp-room-code" onclick="pvpCopyId()">...</div></div>
-    <div id="pvp-status">Connecting...</div>
-    <input type="text" id="pvp-target-id" placeholder="Opponent Room ID" autocomplete="off" onkeydown="if(event.key==='Enter')pvpChallenge()">
-    <button class="pvp-btn pvp-red" onclick="pvpChallenge()">[ Request 1v1 ]</button>
-    <button class="pvp-btn" onclick="closePvp()">[ Cancel ]</button>
+    <div class="pvp-sub">Click a player to challenge</div>
+    <div id="pvp-lobby-status">Connecting...</div>
+    <div id="pvp-players-list"></div>
+    <div id="pvp-manual-toggle" onclick="pvpToggleManual()">▸ Manual connect</div>
+    <div id="pvp-manual-body">
+      <div id="pvp-room-box"><div class="pvp-room-label">Your Room ID (tap to copy)</div><div id="pvp-room-code" onclick="pvpCopyId()">...</div></div>
+      <input type="text" id="pvp-target-id" placeholder="Paste opponent Room ID" autocomplete="off" onkeydown="if(event.key==='Enter')pvpManualChallenge()">
+      <button class="pvp-btn pvp-red" onclick="pvpManualChallenge()">[ Connect ]</button>
+    </div>
+    <button class="pvp-btn" onclick="closePvp()" style="margin-top:8px">[ Leave Lobby ]</button>
+  </div>
+  <div id="pvp-challenge-screen" style="display:none">
+    <h2>INCOMING CHALLENGE</h2>
+    <div class="pvp-sub">Someone wants to fight you</div>
+    <span id="pvp-challenger-name">???</span>
+    <div class="pvp-wants-msg">wants to fight</div>
+    <div class="pvp-btn-row">
+      <button class="pvp-btn pvp-red" onclick="pvpAcceptChallenge()">[ Accept ]</button>
+      <button class="pvp-btn" onclick="pvpDeclineChallenge()">[ Decline ]</button>
+    </div>
+  </div>
+  <div id="pvp-waiting-screen" style="display:none">
+    <h2>WAITING...</h2>
+    <div class="pvp-sub">Challenge sent</div>
+    <div id="pvp-wait-label">Waiting for response...</div>
+    <button class="pvp-btn" onclick="pvpCancelChallenge()">[ Cancel ]</button>
   </div>
   <div id="pvp-ready-screen" style="display:none">
     <h2>OPPONENT FOUND</h2>
@@ -1517,19 +1561,39 @@ function loop(ts){
 }
 
 // ─── 1v1 PVP ─────────────────────────────────────────────────────────
+// Lobby uses PeerJS relay: first player claims fixed peer ID as "host"
+// and relays the player list + challenge messages to all clients.
+// All players also have a game peer (random ID) for direct 1v1 connections.
+const LOBBY_ID='sz-lobby-v4';
 const PVP={
-  active:false,peer:null,conn:null,
-  myName:'',oppName:'',
-  oppMesh:null,oppPos:new THREE.Vector3(40,0,12),oppRot:0,
+  active:false,
+  peer:null,       // game peer (random ID) — used for 1v1 connection
+  hostPeer:null,   // lobby host peer (fixed ID) — only set if we're the host
+  lobbyConn:null,  // our connection to the lobby host (if we're a client)
+  lobbyClients:{}, // {peerId:{conn,name}} — if we're host
+  conn:null,       // active 1v1 game connection
+  myName:'',myPeerId:'',
+  oppName:'',oppPeerId:'', // current opponent info
+  isLobbyHost:false,
+  lobbyPlayers:[],
+  pendingTargetPeerId:null, // peer we've challenged (awaiting response)
   myKills:0,oppKills:0,lastSend:0,isHost:false,
-  oppHp:100,
+  oppMesh:null,oppPos:new THREE.Vector3(40,0,12),oppRot:0,oppHp:100,
 };
 const PVP_WIN=5;
 
 function pvpShowScreen(id){
-  ['pvp-name-screen','pvp-lobby-screen','pvp-ready-screen'].forEach(s=>{
+  ['pvp-name-screen','pvp-lobby-screen','pvp-challenge-screen','pvp-waiting-screen','pvp-ready-screen'].forEach(s=>{
     document.getElementById(s).style.display=(s===id)?'':'none';
   });
+}
+
+function pvpToggleManual(){
+  const b=document.getElementById('pvp-manual-body');
+  const t=document.getElementById('pvp-manual-toggle');
+  const open=b.style.display==='block';
+  b.style.display=open?'none':'block';
+  t.textContent=open?'▸ Manual connect':'▾ Manual connect';
 }
 
 function openPvp(){
@@ -1541,11 +1605,20 @@ function openPvp(){
 
 function closePvp(){
   document.getElementById('pvp-overlay').classList.remove('show');
+  pvpCleanupLobby();
   if(PVP.conn){try{PVP.conn.close();}catch(e){}}PVP.conn=null;
   if(PVP.peer){try{PVP.peer.destroy();}catch(e){}}PVP.peer=null;
-  PVP.active=false;
+  PVP.active=false;PVP.oppName='';PVP.oppPeerId='';PVP.pendingTargetPeerId=null;
   if(PVP.oppMesh){scene.remove(PVP.oppMesh);PVP.oppMesh=null;}
   document.body.classList.remove('pvp-active');
+}
+
+function pvpCleanupLobby(){
+  Object.values(PVP.lobbyClients).forEach(c=>{try{c.conn.close();}catch(e){}});
+  PVP.lobbyClients={};
+  if(PVP.lobbyConn){try{PVP.lobbyConn.close();}catch(e){}}PVP.lobbyConn=null;
+  if(PVP.hostPeer){try{PVP.hostPeer.destroy();}catch(e){}}PVP.hostPeer=null;
+  PVP.isLobbyHost=false;PVP.lobbyPlayers=[];
 }
 
 function pvpCopyId(){
@@ -1558,25 +1631,256 @@ function pvpConfirmName(){
   if(!n){document.getElementById('pvp-name-input').style.borderColor='rgba(255,0,0,0.8)';return;}
   PVP.myName=n;localStorage.setItem('sz_pvp_name',n);
   pvpShowScreen('pvp-lobby-screen');
+  document.getElementById('pvp-lobby-status').textContent='Connecting...';
   document.getElementById('pvp-room-code').textContent='...';
-  document.getElementById('pvp-status').textContent='Connecting to matchmaking...';
+  document.getElementById('pvp-players-list').innerHTML='';
+
+  // Create game peer (random ID)
   const peer=new Peer({debug:0});PVP.peer=peer;
   peer.on('open',id=>{
+    PVP.myPeerId=id;
     document.getElementById('pvp-room-code').textContent=id;
-    document.getElementById('pvp-status').textContent='Waiting for opponent to connect...';
+    pvpTryBecomeHost();
+    // Accept incoming game connections
+    peer.on('connection',conn=>{
+      if(PVP.oppPeerId&&conn.peer===PVP.oppPeerId){
+        pvpBind(conn,false);
+      }
+    });
   });
-  peer.on('connection',conn=>{pvpBind(conn,false);});
-  peer.on('error',err=>{document.getElementById('pvp-status').textContent='Error: '+err.type;});
+  peer.on('error',err=>{
+    document.getElementById('pvp-lobby-status').textContent='Error: '+err.type;
+  });
 }
 
-function pvpChallenge(){
+// ─ Lobby host logic ────────────────────────────────────────────────────
+function pvpTryBecomeHost(){
+  if(PVP.hostPeer)return;
+  const hp=new Peer(LOBBY_ID,{debug:0});PVP.hostPeer=hp;
+  hp.on('open',()=>{
+    PVP.isLobbyHost=true;PVP.lobbyClients={};
+    PVP.lobbyPlayers=[{name:PVP.myName,peerId:PVP.myPeerId}];
+    document.getElementById('pvp-lobby-status').textContent='Online';
+    pvpRenderPlayerList(PVP.lobbyPlayers);
+    hp.on('connection',pvpHandleNewClient);
+  });
+  hp.on('error',err=>{
+    PVP.hostPeer=null;
+    if(err.type==='unavailable-id')pvpJoinAsClient();
+    // other errors: retry
+    else setTimeout(pvpTryBecomeHost,2000);
+  });
+}
+
+function pvpHandleNewClient(conn){
+  PVP.lobbyClients[conn.peer]={conn,name:'?'};
+  conn.on('data',d=>pvpHostOnData(conn,d));
+  conn.on('close',()=>{
+    delete PVP.lobbyClients[conn.peer];
+    pvpHostRebuildAndBroadcast();
+  });
+}
+
+function pvpHostOnData(conn,d){
+  switch(d.type){
+    case 'register':
+      PVP.lobbyClients[conn.peer]={conn,name:d.name};
+      pvpHostRebuildAndBroadcast();
+      break;
+    case 'challenge':{
+      // Challenger is a client, target may be host or another client
+      if(d.targetPeerId===PVP.myPeerId){
+        // Host is being challenged
+        PVP.oppName=d.fromName;PVP.oppPeerId=conn.peer;
+        pvpShowScreen('pvp-challenge-screen');
+        document.getElementById('pvp-challenger-name').textContent=d.fromName.toUpperCase();
+      } else {
+        const t=PVP.lobbyClients[d.targetPeerId];
+        if(t&&t.conn.open){
+          t.conn.send({type:'challenge_incoming',fromName:d.fromName,fromPeerId:conn.peer});
+        } else {
+          conn.send({type:'challenge_result',accepted:false,reason:'offline'});
+        }
+      }
+      break;
+    }
+    case 'challenge_response':{
+      // Accepter is a client; find the original challenger
+      if(d.accepted){
+        if(d.challengerPeerId===PVP.myPeerId){
+          // Host challenged this client and they accepted
+          PVP.oppName=PVP.lobbyClients[conn.peer]?.name||'?';
+          PVP.oppPeerId=conn.peer;
+          pvpDoConnectToOpponent();
+          pvpShowScreen('pvp-ready-screen');
+          document.getElementById('pvp-opp-label').textContent=PVP.oppName.toUpperCase();
+          document.getElementById('pvp-status').textContent='First to '+PVP_WIN+' kills wins';
+        } else {
+          const challenger=PVP.lobbyClients[d.challengerPeerId];
+          if(challenger&&challenger.conn.open){
+            challenger.conn.send({type:'challenge_result',accepted:true,fromPeerId:conn.peer,fromName:PVP.lobbyClients[conn.peer]?.name||'?'});
+          }
+        }
+      } else {
+        if(d.challengerPeerId===PVP.myPeerId){
+          pvpShowScreen('pvp-lobby-screen');
+          notify('Challenge declined','#ff4136',2000);
+        } else {
+          const challenger=PVP.lobbyClients[d.challengerPeerId];
+          if(challenger&&challenger.conn.open)challenger.conn.send({type:'challenge_result',accepted:false,reason:'declined'});
+        }
+      }
+      break;
+    }
+  }
+}
+
+function pvpHostRebuildAndBroadcast(){
+  const players=[{name:PVP.myName,peerId:PVP.myPeerId}];
+  Object.values(PVP.lobbyClients).forEach(c=>players.push({name:c.name,peerId:c.conn.peer}));
+  PVP.lobbyPlayers=players;
+  pvpRenderPlayerList(players);
+  Object.values(PVP.lobbyClients).forEach(c=>{
+    if(c.conn.open)c.conn.send({type:'player_list',players});
+  });
+}
+
+// ─ Lobby client logic ──────────────────────────────────────────────────
+function pvpJoinAsClient(){
+  if(!PVP.peer||PVP.lobbyConn)return;
+  const conn=PVP.peer.connect(LOBBY_ID,{reliable:true});
+  PVP.lobbyConn=conn;
+  conn.on('open',()=>{
+    conn.send({type:'register',name:PVP.myName,peerId:PVP.myPeerId});
+    document.getElementById('pvp-lobby-status').textContent='Online';
+  });
+  conn.on('data',pvpClientOnData);
+  conn.on('close',()=>{
+    PVP.lobbyConn=null;
+    document.getElementById('pvp-lobby-status').textContent='Reconnecting...';
+    setTimeout(pvpTryBecomeHost,1500);
+  });
+  conn.on('error',()=>{PVP.lobbyConn=null;setTimeout(pvpJoinAsClient,2000);});
+}
+
+function pvpClientOnData(d){
+  switch(d.type){
+    case 'player_list':
+      PVP.lobbyPlayers=d.players;
+      pvpRenderPlayerList(d.players);
+      break;
+    case 'challenge_incoming':
+      PVP.oppName=d.fromName;PVP.oppPeerId=d.fromPeerId;
+      pvpShowScreen('pvp-challenge-screen');
+      document.getElementById('pvp-challenger-name').textContent=d.fromName.toUpperCase();
+      break;
+    case 'challenge_result':
+      if(d.accepted){
+        PVP.oppName=d.fromName;PVP.oppPeerId=d.fromPeerId;
+        pvpDoConnectToOpponent();
+        pvpShowScreen('pvp-ready-screen');
+        document.getElementById('pvp-opp-label').textContent=d.fromName.toUpperCase();
+        document.getElementById('pvp-status').textContent='First to '+PVP_WIN+' kills wins';
+      } else {
+        PVP.pendingTargetPeerId=null;
+        pvpShowScreen('pvp-lobby-screen');
+        notify(d.reason==='declined'?'Challenge declined':'Player unavailable','#ff4136',2000);
+      }
+      break;
+  }
+}
+
+// ─ Player list UI ──────────────────────────────────────────────────────
+function pvpRenderPlayerList(players){
+  const el=document.getElementById('pvp-players-list');
+  if(!el)return;
+  el.innerHTML='';
+  players.forEach(p=>{
+    const isMe=p.peerId===PVP.myPeerId;
+    const row=document.createElement('div');
+    row.className='pvp-player-row'+(isMe?'':' pvp-other');
+    const safeName=p.name.replace(/[<>"']/g,'').toUpperCase();
+    const safePeerId=p.peerId.replace(/['"]/g,'');
+    const safePeerIdJs=JSON.stringify(safePeerId);
+    const safeNameJs=JSON.stringify(p.name);
+    row.innerHTML=`<div class="dot"></div><div class="pname">${safeName}</div>`+
+      (isMe?`<span class="me-tag">YOU</span>`:`<button class="chbtn" onclick="pvpRequestChallenge(${safePeerIdJs},${safeNameJs})">[ Challenge ]</button>`);
+    el.appendChild(row);
+  });
+}
+
+// ─ Challenge flow ──────────────────────────────────────────────────────
+function pvpRequestChallenge(targetPeerId,targetName){
+  if(!PVP.peer||!PVP.myPeerId)return;
+  PVP.pendingTargetPeerId=targetPeerId;
+  pvpShowScreen('pvp-waiting-screen');
+  document.getElementById('pvp-wait-label').textContent='Waiting for '+targetName.toUpperCase()+'...';
+  const msg={type:'challenge',fromName:PVP.myName,fromPeerId:PVP.myPeerId,targetPeerId};
+  if(PVP.isLobbyHost){
+    // Target is a client; relay directly
+    const t=PVP.lobbyClients[targetPeerId];
+    if(t&&t.conn.open){
+      PVP.oppName=targetName;PVP.oppPeerId=targetPeerId;
+      t.conn.send({type:'challenge_incoming',fromName:PVP.myName,fromPeerId:PVP.myPeerId});
+    } else {
+      pvpShowScreen('pvp-lobby-screen');
+      notify('Player unavailable','#ff4136',2000);
+    }
+  } else if(PVP.lobbyConn&&PVP.lobbyConn.open){
+    PVP.lobbyConn.send(msg);
+  }
+}
+
+function pvpAcceptChallenge(){
+  const challengerPeerId=PVP.oppPeerId;
+  const resp={type:'challenge_response',accepted:true,challengerPeerId,fromPeerId:PVP.myPeerId};
+  if(PVP.isLobbyHost){
+    // Challenger is a client
+    PVP.oppPeerId=challengerPeerId;
+    const c=PVP.lobbyClients[challengerPeerId];
+    if(c&&c.conn.open)c.conn.send({type:'challenge_result',accepted:true,fromPeerId:PVP.myPeerId,fromName:PVP.myName});
+  } else if(PVP.lobbyConn&&PVP.lobbyConn.open){
+    PVP.lobbyConn.send(resp);
+  }
+  pvpShowScreen('pvp-ready-screen');
+  document.getElementById('pvp-opp-label').textContent=(PVP.oppName||'???').toUpperCase();
+  document.getElementById('pvp-status').textContent='First to '+PVP_WIN+' kills wins';
+}
+
+function pvpDeclineChallenge(){
+  const challengerPeerId=PVP.oppPeerId;
+  const resp={type:'challenge_response',accepted:false,challengerPeerId,fromPeerId:PVP.myPeerId};
+  if(PVP.isLobbyHost){
+    const c=PVP.lobbyClients[challengerPeerId];
+    if(c&&c.conn.open)c.conn.send({type:'challenge_result',accepted:false,reason:'declined'});
+  } else if(PVP.lobbyConn&&PVP.lobbyConn.open){
+    PVP.lobbyConn.send(resp);
+  }
+  PVP.oppName='';PVP.oppPeerId='';
+  pvpShowScreen('pvp-lobby-screen');
+}
+
+function pvpCancelChallenge(){
+  PVP.pendingTargetPeerId=null;PVP.oppPeerId='';
+  pvpShowScreen('pvp-lobby-screen');
+}
+
+function pvpDoConnectToOpponent(){
+  if(!PVP.peer||!PVP.oppPeerId)return;
+  const conn=PVP.peer.connect(PVP.oppPeerId,{reliable:true});
+  pvpBind(conn,true);
+}
+
+// ─ Manual room-ID connect (legacy fallback) ────────────────────────────
+function pvpManualChallenge(){
   const tid=document.getElementById('pvp-target-id').value.trim();
   if(!tid||!PVP.peer)return;
-  document.getElementById('pvp-status').textContent='Connecting to opponent...';
+  document.getElementById('pvp-lobby-status').textContent='Connecting...';
   const conn=PVP.peer.connect(tid,{reliable:true});
   pvpBind(conn,true);
 }
 
+// ─ Game connection ─────────────────────────────────────────────────────
 function pvpBind(conn,isChallenger){
   PVP.conn=conn;PVP.isHost=!isChallenger;
   conn.on('open',()=>{conn.send({type:'hello',name:PVP.myName});});
@@ -1592,7 +1896,6 @@ function pvpOnData(d){
       document.getElementById('pvp-opp-label').textContent=d.name.toUpperCase();
       pvpShowScreen('pvp-ready-screen');
       document.getElementById('pvp-status').textContent='First to '+PVP_WIN+' kills wins';
-      // Both sides send hello so the connector also gets here
       if(!PVP.isHost)PVP.conn.send({type:'hello',name:PVP.myName});
       break;
     case 'start':
@@ -1604,7 +1907,7 @@ function pvpOnData(d){
     case 'hit':
       takeDamage(d.dmg);
       break;
-    case 'kill': // opponent died → WE scored
+    case 'kill':
       PVP.myKills++;pvpUpdateHUD();
       if(PVP.myKills>=PVP_WIN){pvpEnd('YOU WIN!',true);return;}
       notify('☠ Enemy eliminated','#2ecc40',1800);
@@ -1622,20 +1925,18 @@ function pvpStartMatch(){
 }
 
 function pvpBeginMatch(asHost){
+  pvpCleanupLobby(); // leave lobby while in match
   document.getElementById('pvp-overlay').classList.remove('show');
   PVP.active=true;PVP.myKills=0;PVP.oppKills=0;PVP.isHost=asHost;
   document.body.classList.add('pvp-active');
   pvpUpdateHUD();
-  // Start game, strip AI enemies
   setEnvironment('bunker');
   initGame();G.enemies=[];
   G.running=true;G.paused=false;G.lastTime=performance.now();
-  // Place player — host at far end, guest at near end
   const myZ=asHost?17*CS:3*CS;
   const oppZ=asHost?3*CS:17*CS;
   cam.position.set(COLS*CS/2,G.p.height,myZ);G.p.pos.set(COLS*CS/2,0,myZ);
   PVP.oppPos.set(COLS*CS/2,0,oppZ);
-  // Opponent avatar
   if(PVP.oppMesh){scene.remove(PVP.oppMesh);PVP.oppMesh=null;}
   PVP.oppMesh=makeEnemyMesh(0xcc4400,3);
   PVP.oppMesh.position.set(COLS*CS/2,0,oppZ);
@@ -1646,7 +1947,6 @@ function pvpBeginMatch(asHost){
 }
 
 function pvpDead(){
-  // We died — tell opponent they scored, track opp kills here too
   G.p.hp=100;updateHUD();
   if(PVP.conn&&PVP.conn.open)PVP.conn.send({type:'kill'});
   PVP.oppKills++;pvpUpdateHUD();
@@ -1676,11 +1976,11 @@ function pvpEnd(reason,iWon){
   document.body.classList.remove('pvp-active');
   G.running=false;
   if(PVP.conn){try{PVP.conn.send({type:'end',reason});}catch(e){}try{PVP.conn.close();}catch(e){}}
-  if(PVP.peer){try{PVP.peer.destroy();}catch(e){}}
-  PVP.conn=null;PVP.peer=null;
+  PVP.conn=null;
+  if(PVP.peer){try{PVP.peer.destroy();}catch(e){}}PVP.peer=null;
   if(PVP.oppMesh){scene.remove(PVP.oppMesh);PVP.oppMesh=null;}
   document.exitPointerLock&&document.exitPointerLock();
-  const title=iWon===true?'VICTORY':iWon===false?'MATCH OVER':'MATCH OVER';
+  const title=iWon===true?'VICTORY':'MATCH OVER';
   showOverlay(title,'1v1 Result',
     `<span style="color:#ffdc00">You: ${PVP.myKills} kills</span><br><span style="color:#aaa">${PVP.oppName||'Opponent'}: ${PVP.oppKills} kills</span><br><br><span style="color:#888">${reason||''}</span>`,
     'Main Menu',()=>{
