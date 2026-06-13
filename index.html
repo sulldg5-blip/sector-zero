@@ -78,6 +78,28 @@ body.touch-device #overlay .desktop-info{display:none;}
 body.touch-device #overlay .mobile-info{display:block !important;}
 body.touch-device #overlay button{font-size:17px;padding:18px 64px;border-width:2px;letter-spacing:5px;margin-top:8px;}
 
+/* ── 1v1 PVP ── */
+#pvp-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.96);z-index:300;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:'Courier New',monospace;}
+#pvp-overlay.show{display:flex;}
+#pvp-overlay h2{font-size:24px;letter-spacing:7px;text-transform:uppercase;margin-bottom:6px;color:#ff4136;}
+#pvp-overlay .pvp-sub{font-size:9px;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:26px;}
+#pvp-overlay input[type=text]{display:block;width:270px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.22);color:#fff;padding:12px 16px;font-size:14px;font-family:'Courier New',monospace;letter-spacing:3px;margin:0 auto 14px;text-align:center;}
+#pvp-overlay input[type=text]:focus{outline:none;border-color:rgba(255,65,54,0.7);}
+#pvp-overlay input[type=text]::placeholder{color:#444;letter-spacing:1px;}
+.pvp-btn{display:block;width:270px;margin:5px auto;background:transparent;border:1px solid rgba(255,255,255,0.28);color:#ccc;padding:12px 0;font-size:11px;letter-spacing:4px;text-transform:uppercase;cursor:pointer;font-family:'Courier New',monospace;transition:all .2s;}
+.pvp-btn:hover{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.6);color:#fff;}
+.pvp-btn.pvp-red{border-color:rgba(255,65,54,0.55);color:#ff4136;}
+.pvp-btn.pvp-red:hover{background:rgba(255,65,54,0.12);border-color:rgba(255,65,54,0.9);}
+#pvp-room-box{background:rgba(255,220,0,0.05);border:1px solid rgba(255,220,0,0.25);padding:14px 24px;margin:0 auto 20px;width:270px;text-align:center;box-sizing:border-box;}
+.pvp-room-label{font-size:8px;letter-spacing:3px;color:#666;text-transform:uppercase;margin-bottom:8px;}
+#pvp-room-code{font-size:20px;font-weight:bold;letter-spacing:5px;color:#ffdc00;cursor:pointer;user-select:all;}
+#pvp-status{font-size:9px;letter-spacing:2px;color:#555;text-align:center;margin-bottom:18px;min-height:14px;}
+#pvp-opp-label{display:block;font-size:20px;letter-spacing:4px;color:#fff;text-align:center;margin-bottom:20px;}
+#pvp-score-hud{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:60;display:none;background:rgba(0,0,0,0.75);border:1px solid rgba(255,255,255,0.12);padding:7px 24px;font-family:'Courier New',monospace;font-size:12px;letter-spacing:3px;color:#fff;pointer-events:none;white-space:nowrap;}
+body.pvp-active #pvp-score-hud{display:block;}
+#pvp-open-btn{margin-top:10px;border-color:rgba(255,65,54,0.45)!important;color:#ff4136!important;}
+#pvp-open-btn:hover{background:rgba(255,65,54,0.1)!important;border-color:rgba(255,65,54,0.8)!important;}
+
 /* ── OVERLAY (start / pause / win) ── */
 #overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.88);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;color:#fff;}
 #overlay h1{font-size:46px;letter-spacing:8px;text-transform:uppercase;margin-bottom:6px;}
@@ -180,6 +202,7 @@ body.touch-device #overlay button{font-size:17px;padding:18px 64px;border-width:
     <span style="color:#44ccff">Levels 1-2: Bunker — get the key &amp; escape.<br>Level 3+: Grass — kill 10 enemies then reach extraction.</span>
   </div>
   <button id="start-btn">[ Deploy ]</button>
+  <button id="pvp-open-btn" onclick="openPvp()">[ 1v1 Challenge ]</button>
 </div>
 
 <!-- SHOP -->
@@ -196,6 +219,36 @@ body.touch-device #overlay button{font-size:17px;padding:18px 64px;border-width:
     </div>
   </div>
 </div>
+
+<!-- 1v1 PVP OVERLAY -->
+<div id="pvp-overlay">
+  <div id="pvp-name-screen">
+    <h2>1v1 MODE</h2>
+    <div class="pvp-sub">Set your callsign before entering the arena</div>
+    <input type="text" id="pvp-name-input" placeholder="Callsign..." maxlength="16" autocomplete="off" onkeydown="if(event.key==='Enter')pvpConfirmName()">
+    <button class="pvp-btn pvp-red" onclick="pvpConfirmName()">[ Confirm Callsign ]</button>
+    <button class="pvp-btn" onclick="closePvp()">[ Cancel ]</button>
+  </div>
+  <div id="pvp-lobby-screen" style="display:none">
+    <h2>1v1 LOBBY</h2>
+    <div class="pvp-sub">Share your room ID — or enter theirs to challenge</div>
+    <div id="pvp-room-box"><div class="pvp-room-label">Your Room ID (tap to copy)</div><div id="pvp-room-code" onclick="pvpCopyId()">...</div></div>
+    <div id="pvp-status">Connecting...</div>
+    <input type="text" id="pvp-target-id" placeholder="Opponent Room ID" autocomplete="off" onkeydown="if(event.key==='Enter')pvpChallenge()">
+    <button class="pvp-btn pvp-red" onclick="pvpChallenge()">[ Request 1v1 ]</button>
+    <button class="pvp-btn" onclick="closePvp()">[ Cancel ]</button>
+  </div>
+  <div id="pvp-ready-screen" style="display:none">
+    <h2>OPPONENT FOUND</h2>
+    <div class="pvp-sub">Ready to fight?</div>
+    <span id="pvp-opp-label">???</span>
+    <div id="pvp-status">First to 5 kills wins</div>
+    <button class="pvp-btn pvp-red" onclick="pvpStartMatch()">[ Start Match ]</button>
+    <button class="pvp-btn" onclick="closePvp()">[ Cancel ]</button>
+  </div>
+</div>
+<!-- PVP score HUD -->
+<div id="pvp-score-hud"><span id="pvp-my-score">YOU 0</span> &nbsp;—&nbsp; <span id="pvp-opp-score">OPP 0</span></div>
 
 <!-- Portrait warning -->
 <div id="portrait-warn">
@@ -216,6 +269,7 @@ body.touch-device #overlay button{font-size:17px;padding:18px 64px;border-width:
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.4.7/peerjs.min.js"></script>
 <script>
 // ─── MAP ─────────────────────────────────────────────────────────────
 const MAP=[
@@ -879,7 +933,7 @@ function takeDamage(raw){
   if(rem>0){G.p.hp=Math.max(0,G.p.hp-rem);}
   updateHUD();
   hitFlash();if(reduced>0)SFX.playerHit();
-  if(G.p.hp<=0)gameOver();
+  if(G.p.hp<=0){if(PVP.active)pvpDead();else gameOver();}
 }
 
 function shoot(){
@@ -901,6 +955,7 @@ function shoot(){
     const hits=rc.intersectObjects(aliveMeshes,true);
     if(hits.length){const top=hits[0].object;const enemy=G.enemies.find(e=>e.alive&&(e.mesh===top||e.mesh===top.parent));if(enemy){const dmg=Math.round((Math.floor(Math.random()*(w.dmgMax-w.dmgMin+1))+w.dmgMin)*dmgMult);hitEnemy(enemy,dmg,hits[0].point);}}
     const wh=rc.intersectObjects(wallMeshes);if(wh.length){spawnParticles(wh[0].point,0xaaaaaa,4,2);spawnDecal(wh[0].point,wh[0].face.normal.clone().transformDirection(wh[0].object.matrixWorld));}
+    if(PVP.active&&PVP.oppMesh&&PVP.conn&&PVP.conn.open){const pvpH=rc.intersectObject(PVP.oppMesh,true);if(pvpH.length&&pvpH[0].distance<40){const dmg=Math.round((Math.floor(Math.random()*(w.dmgMax-w.dmgMin+1))+w.dmgMin)*dmgMult);spawnParticles(pvpH[0].point,0xff2200,7,3);SFX.enemyHit();PVP.conn.send({type:'hit',dmg});}}
   }
   if(!wa.mag)reload();
 }
@@ -1383,6 +1438,7 @@ function showOverlay(title,sub,info,btn,onBtn){
   ov.querySelector('h1').textContent=title;ov.querySelector('.sub').textContent=sub;
   ov.querySelector('.info').innerHTML=info;ov.querySelector('button').textContent='[ '+btn+' ]';
   ov.classList.remove('hidden');document.getElementById('start-btn').onclick=onBtn;
+  document.getElementById('pvp-open-btn').style.display='none';
 }
 function togglePause(){
   if(!G.running)return;G.paused=!G.paused;
@@ -1416,6 +1472,7 @@ function loop(ts){
   if(!G.running)return;
   const dt=Math.min((ts-G.lastTime)/1000,0.05);G.lastTime=ts;
   updatePlayer(dt);G.enemies.forEach(e=>updateEnemy(e,dt));updateProjectiles(dt);updateParticles(dt);updateWeaponPickups(dt);
+  if(PVP.active){const now=performance.now();if(now-PVP.lastSend>50&&PVP.conn&&PVP.conn.open){PVP.conn.send({type:'pos',x:cam.position.x,z:cam.position.z,ry:G.yaw});PVP.lastSend=now;}if(PVP.oppMesh){PVP.oppMesh.position.x+=(PVP.oppPos.x-PVP.oppMesh.position.x)*0.28;PVP.oppMesh.position.z+=(PVP.oppPos.z-PVP.oppMesh.position.z)*0.28;PVP.oppMesh.rotation.y=PVP.oppRot;}}
   // Exit detection (pulsing handled inside split below)
   const isHillsLevel=G.levelCfg&&G.levelCfg.environment==='hills';
   if(G.running&&!G._exitUsed){
@@ -1457,6 +1514,180 @@ function loop(ts){
   }
   drawMinimap();vcAccum+=dt;if(vcAccum>1){vcAccum=0;checkVictory();}
   renderer.render(scene,cam);requestAnimationFrame(loop);
+}
+
+// ─── 1v1 PVP ─────────────────────────────────────────────────────────
+const PVP={
+  active:false,peer:null,conn:null,
+  myName:'',oppName:'',
+  oppMesh:null,oppPos:new THREE.Vector3(40,0,12),oppRot:0,
+  myKills:0,oppKills:0,lastSend:0,isHost:false,
+  oppHp:100,
+};
+const PVP_WIN=5;
+
+function pvpShowScreen(id){
+  ['pvp-name-screen','pvp-lobby-screen','pvp-ready-screen'].forEach(s=>{
+    document.getElementById(s).style.display=(s===id)?'':'none';
+  });
+}
+
+function openPvp(){
+  document.getElementById('pvp-overlay').classList.add('show');
+  const saved=localStorage.getItem('sz_pvp_name');
+  if(saved)document.getElementById('pvp-name-input').value=saved;
+  pvpShowScreen('pvp-name-screen');
+}
+
+function closePvp(){
+  document.getElementById('pvp-overlay').classList.remove('show');
+  if(PVP.conn){try{PVP.conn.close();}catch(e){}}PVP.conn=null;
+  if(PVP.peer){try{PVP.peer.destroy();}catch(e){}}PVP.peer=null;
+  PVP.active=false;
+  if(PVP.oppMesh){scene.remove(PVP.oppMesh);PVP.oppMesh=null;}
+  document.body.classList.remove('pvp-active');
+}
+
+function pvpCopyId(){
+  const code=document.getElementById('pvp-room-code').textContent;
+  navigator.clipboard&&navigator.clipboard.writeText(code).then(()=>notify('Room ID copied','#ffdc00',1500));
+}
+
+function pvpConfirmName(){
+  const n=document.getElementById('pvp-name-input').value.trim().slice(0,16);
+  if(!n){document.getElementById('pvp-name-input').style.borderColor='rgba(255,0,0,0.8)';return;}
+  PVP.myName=n;localStorage.setItem('sz_pvp_name',n);
+  pvpShowScreen('pvp-lobby-screen');
+  document.getElementById('pvp-room-code').textContent='...';
+  document.getElementById('pvp-status').textContent='Connecting to matchmaking...';
+  const peer=new Peer({debug:0});PVP.peer=peer;
+  peer.on('open',id=>{
+    document.getElementById('pvp-room-code').textContent=id;
+    document.getElementById('pvp-status').textContent='Waiting for opponent to connect...';
+  });
+  peer.on('connection',conn=>{pvpBind(conn,false);});
+  peer.on('error',err=>{document.getElementById('pvp-status').textContent='Error: '+err.type;});
+}
+
+function pvpChallenge(){
+  const tid=document.getElementById('pvp-target-id').value.trim();
+  if(!tid||!PVP.peer)return;
+  document.getElementById('pvp-status').textContent='Connecting to opponent...';
+  const conn=PVP.peer.connect(tid,{reliable:true});
+  pvpBind(conn,true);
+}
+
+function pvpBind(conn,isChallenger){
+  PVP.conn=conn;PVP.isHost=!isChallenger;
+  conn.on('open',()=>{conn.send({type:'hello',name:PVP.myName});});
+  conn.on('data',pvpOnData);
+  conn.on('close',()=>{if(PVP.active)pvpEnd('Opponent disconnected',false);});
+  conn.on('error',()=>{if(PVP.active)pvpEnd('Connection lost',false);});
+}
+
+function pvpOnData(d){
+  switch(d.type){
+    case 'hello':
+      PVP.oppName=d.name;
+      document.getElementById('pvp-opp-label').textContent=d.name.toUpperCase();
+      pvpShowScreen('pvp-ready-screen');
+      document.getElementById('pvp-status').textContent='First to '+PVP_WIN+' kills wins';
+      // Both sides send hello so the connector also gets here
+      if(!PVP.isHost)PVP.conn.send({type:'hello',name:PVP.myName});
+      break;
+    case 'start':
+      pvpBeginMatch(false);
+      break;
+    case 'pos':
+      PVP.oppPos.set(d.x,0,d.z);PVP.oppRot=d.ry;
+      break;
+    case 'hit':
+      takeDamage(d.dmg);
+      break;
+    case 'kill': // opponent died → WE scored
+      PVP.myKills++;pvpUpdateHUD();
+      if(PVP.myKills>=PVP_WIN){pvpEnd('YOU WIN!',true);return;}
+      notify('☠ Enemy eliminated','#2ecc40',1800);
+      break;
+    case 'end':
+      pvpEnd(d.reason,false);
+      break;
+  }
+}
+
+function pvpStartMatch(){
+  PVP.isHost=true;
+  if(PVP.conn&&PVP.conn.open)PVP.conn.send({type:'start'});
+  pvpBeginMatch(true);
+}
+
+function pvpBeginMatch(asHost){
+  document.getElementById('pvp-overlay').classList.remove('show');
+  PVP.active=true;PVP.myKills=0;PVP.oppKills=0;PVP.isHost=asHost;
+  document.body.classList.add('pvp-active');
+  pvpUpdateHUD();
+  // Start game, strip AI enemies
+  setEnvironment('bunker');
+  initGame();G.enemies=[];
+  G.running=true;G.paused=false;G.lastTime=performance.now();
+  // Place player — host at far end, guest at near end
+  const myZ=asHost?17*CS:3*CS;
+  const oppZ=asHost?3*CS:17*CS;
+  cam.position.set(COLS*CS/2,G.p.height,myZ);G.p.pos.set(COLS*CS/2,0,myZ);
+  PVP.oppPos.set(COLS*CS/2,0,oppZ);
+  // Opponent avatar
+  if(PVP.oppMesh){scene.remove(PVP.oppMesh);PVP.oppMesh=null;}
+  PVP.oppMesh=makeEnemyMesh(0xcc4400,3);
+  PVP.oppMesh.position.set(COLS*CS/2,0,oppZ);
+  scene.add(PVP.oppMesh);
+  if(!IS_TOUCH)canvas.requestPointerLock();else G.mouse.locked=true;
+  notify('1v1 VS '+PVP.oppName+' — First to '+PVP_WIN+' kills wins','#ff4136',4500);
+  requestAnimationFrame(loop);
+}
+
+function pvpDead(){
+  // We died — tell opponent they scored, track opp kills here too
+  G.p.hp=100;updateHUD();
+  if(PVP.conn&&PVP.conn.open)PVP.conn.send({type:'kill'});
+  PVP.oppKills++;pvpUpdateHUD();
+  if(PVP.oppKills>=PVP_WIN){pvpEnd(PVP.oppName+' wins!',false);return;}
+  notify('💀 YOU DIED — Respawning in 2.5s...','#ff4136',2500);
+  pvpRespawn();
+}
+
+function pvpRespawn(){
+  const myZ=PVP.isHost?17*CS:3*CS;
+  setTimeout(()=>{
+    G.p.hp=100;G.p.shield=0;G.p.armorHp=0;
+    cam.position.set(COLS*CS/2,G.p.height,myZ);
+    G.p.pos.set(COLS*CS/2,0,myZ);
+    updateHUD();
+  },2500);
+}
+
+function pvpUpdateHUD(){
+  document.getElementById('pvp-my-score').textContent='YOU '+PVP.myKills;
+  document.getElementById('pvp-opp-score').textContent=(PVP.oppName||'OPP')+' '+PVP.oppKills;
+}
+
+function pvpEnd(reason,iWon){
+  if(!PVP.active&&!document.getElementById('pvp-overlay').classList.contains('show'))return;
+  PVP.active=false;
+  document.body.classList.remove('pvp-active');
+  G.running=false;
+  if(PVP.conn){try{PVP.conn.send({type:'end',reason});}catch(e){}try{PVP.conn.close();}catch(e){}}
+  if(PVP.peer){try{PVP.peer.destroy();}catch(e){}}
+  PVP.conn=null;PVP.peer=null;
+  if(PVP.oppMesh){scene.remove(PVP.oppMesh);PVP.oppMesh=null;}
+  document.exitPointerLock&&document.exitPointerLock();
+  const title=iWon===true?'VICTORY':iWon===false?'MATCH OVER':'MATCH OVER';
+  showOverlay(title,'1v1 Result',
+    `<span style="color:#ffdc00">You: ${PVP.myKills} kills</span><br><span style="color:#aaa">${PVP.oppName||'Opponent'}: ${PVP.oppKills} kills</span><br><br><span style="color:#888">${reason||''}</span>`,
+    'Main Menu',()=>{
+      document.getElementById('overlay').classList.add('hidden');
+      document.getElementById('pvp-open-btn').style.display='';
+    }
+  );
 }
 
 // ─── FULLSCREEN (mobile) ─────────────────────────────────────────────
