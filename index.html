@@ -29,6 +29,9 @@ body{background:#000;overflow:hidden;font-family:'Courier New',monospace;}
 #kills-val{color:#ff4136;text-shadow:0 0 8px rgba(255,65,54,.4);}
 #coins-val{color:#ffdc00;text-shadow:0 0 8px rgba(255,220,0,.4);}
 #minimap-wrap{position:absolute;top:20px;right:20px;}
+#third-person-btn{position:absolute;top:200px;right:20px;background:transparent;border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.55);padding:7px 14px;font-size:10px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-family:'Courier New',monospace;pointer-events:auto;transition:all .2s;white-space:nowrap;}
+#third-person-btn:hover{border-color:rgba(255,255,255,.6);color:#fff;}
+#third-person-btn.active{border-color:#44ccff;color:#44ccff;text-shadow:0 0 8px rgba(68,204,255,.5);}
 #minimap-label{font-size:9px;letter-spacing:2px;color:#555;text-align:center;margin-bottom:4px;text-transform:uppercase;}
 #minimap{border:1px solid rgba(255,255,255,0.15);display:block;}
 #kill-feed{position:absolute;top:80px;right:22px;display:flex;flex-direction:column;gap:5px;align-items:flex-end;}
@@ -82,7 +85,7 @@ body.touch-device #overlay button{font-size:17px;padding:18px 64px;border-width:
 #pvp-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.96);z-index:300;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:'Courier New',monospace;}
 #pvp-overlay.show{display:flex;}
 #pvp-overlay h2{font-size:24px;letter-spacing:7px;text-transform:uppercase;margin-bottom:6px;color:#ff4136;}
-#pvp-overlay .pvp-sub{font-size:9px;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:26px;}
+#pvp-overlay .pvp-sub{font-size:9px;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:20px;}
 #pvp-overlay input[type=text]{display:block;width:270px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.22);color:#fff;padding:12px 16px;font-size:14px;font-family:'Courier New',monospace;letter-spacing:3px;margin:0 auto 14px;text-align:center;}
 #pvp-overlay input[type=text]:focus{outline:none;border-color:rgba(255,65,54,0.7);}
 #pvp-overlay input[type=text]::placeholder{color:#444;letter-spacing:1px;}
@@ -90,15 +93,50 @@ body.touch-device #overlay button{font-size:17px;padding:18px 64px;border-width:
 .pvp-btn:hover{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.6);color:#fff;}
 .pvp-btn.pvp-red{border-color:rgba(255,65,54,0.55);color:#ff4136;}
 .pvp-btn.pvp-red:hover{background:rgba(255,65,54,0.12);border-color:rgba(255,65,54,0.9);}
-#pvp-room-box{background:rgba(255,220,0,0.05);border:1px solid rgba(255,220,0,0.25);padding:14px 24px;margin:0 auto 20px;width:270px;text-align:center;box-sizing:border-box;}
+#pvp-room-box{background:rgba(255,220,0,0.05);border:1px solid rgba(255,220,0,0.25);padding:10px 20px 12px;margin:0 auto 10px;width:270px;text-align:center;box-sizing:border-box;}
 .pvp-room-label{font-size:8px;letter-spacing:3px;color:#666;text-transform:uppercase;margin-bottom:8px;}
-#pvp-room-code{font-size:20px;font-weight:bold;letter-spacing:5px;color:#ffdc00;cursor:pointer;user-select:all;}
-#pvp-status{font-size:9px;letter-spacing:2px;color:#555;text-align:center;margin-bottom:18px;min-height:14px;}
+#pvp-room-code-wrap{display:flex;align-items:center;justify-content:center;gap:8px;}
+#pvp-room-code-input{width:90px;background:transparent;border:none;border-bottom:2px solid rgba(255,220,0,0.5);color:#ffdc00;font-size:22px;font-weight:bold;letter-spacing:6px;font-family:'Courier New',monospace;text-align:center;padding:2px 0;outline:none;}
+#pvp-room-code-input::placeholder{color:rgba(255,220,0,0.2);letter-spacing:4px;}
+#pvp-room-code-input:focus{border-bottom-color:#ffdc00;}
+#pvp-claim-btn{background:transparent;border:1px solid rgba(255,220,0,0.4);color:#ffdc00;padding:5px 10px;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Courier New',monospace;transition:all .2s;}
+#pvp-claim-btn:hover{background:rgba(255,220,0,0.12);border-color:#ffdc00;}
+#pvp-claim-btn:disabled{opacity:0.35;cursor:default;}
+#pvp-room-status{font-size:9px;letter-spacing:2px;margin-top:6px;min-height:13px;}
+#pvp-status{font-size:9px;letter-spacing:2px;color:#555;text-align:center;margin-bottom:14px;min-height:14px;}
 #pvp-opp-label{display:block;font-size:20px;letter-spacing:4px;color:#fff;text-align:center;margin-bottom:20px;}
 #pvp-score-hud{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:60;display:none;background:rgba(0,0,0,0.75);border:1px solid rgba(255,255,255,0.12);padding:7px 24px;font-family:'Courier New',monospace;font-size:12px;letter-spacing:3px;color:#fff;pointer-events:none;white-space:nowrap;}
 body.pvp-active #pvp-score-hud{display:block;}
 #pvp-open-btn{margin-top:10px;border-color:rgba(255,65,54,0.45)!important;color:#ff4136!important;}
 #pvp-open-btn:hover{background:rgba(255,65,54,0.1)!important;border-color:rgba(255,65,54,0.8)!important;}
+/* player list */
+#pvp-players-list{width:300px;max-height:200px;overflow-y:auto;margin:0 auto 12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.02);}
+#pvp-players-list:empty::after{content:'No players online yet...';display:block;padding:16px;font-size:9px;letter-spacing:2px;color:#444;text-align:center;}
+.pvp-player-row{display:flex;align-items:center;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.06);cursor:default;transition:background .15s;}
+.pvp-player-row:last-child{border-bottom:none;}
+.pvp-player-row.pvp-other:hover{background:rgba(255,65,54,0.07);cursor:pointer;}
+.pvp-player-row .dot{width:6px;height:6px;background:#2ecc40;border-radius:50%;margin-right:10px;flex-shrink:0;box-shadow:0 0 4px #2ecc40;}
+.pvp-player-row .pname{flex:1;font-size:12px;letter-spacing:2px;color:#ddd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pvp-player-row .me-tag{font-size:8px;color:#444;letter-spacing:1px;}
+.pvp-player-row .chbtn{background:rgba(255,65,54,0.1);border:1px solid rgba(255,65,54,0.4);color:#ff4136;padding:4px 10px;font-size:8px;letter-spacing:2px;cursor:pointer;font-family:'Courier New',monospace;transition:all .15s;white-space:nowrap;}
+.pvp-player-row .chbtn:hover{background:rgba(255,65,54,0.25);border-color:rgba(255,65,54,0.9);}
+#pvp-callsign-row{font-size:10px;letter-spacing:2px;color:#555;text-align:center;margin-bottom:10px;text-transform:uppercase;}
+#pvp-callsign-row span#pvp-my-callsign{color:#ffdc00;}
+#pvp-change-name{color:#333;cursor:pointer;font-size:12px;transition:color .2s;}
+#pvp-change-name:hover{color:#aaa;}
+#pvp-lobby-status{font-size:9px;letter-spacing:2px;color:#555;text-align:center;margin-bottom:10px;}
+/* manual connect toggle */
+#pvp-manual-toggle{font-size:9px;letter-spacing:2px;color:#333;text-align:center;margin-bottom:8px;cursor:pointer;padding:4px 0;border-top:1px solid rgba(255,255,255,0.06);width:300px;}
+#pvp-manual-toggle:hover{color:#555;}
+#pvp-manual-body{display:none;width:270px;margin:0 auto;}
+/* challenge incoming */
+#pvp-challenge-screen{text-align:center;}
+#pvp-challenger-name{display:block;font-size:22px;letter-spacing:5px;color:#ffdc00;margin-bottom:6px;}
+.pvp-wants-msg{font-size:9px;color:#555;letter-spacing:2px;margin-bottom:22px;}
+.pvp-btn-row{display:flex;gap:10px;width:270px;margin:0 auto;}
+.pvp-btn-row .pvp-btn{flex:1;margin:0;}
+/* waiting screen */
+#pvp-wait-label{font-size:13px;letter-spacing:3px;color:#aaa;text-align:center;margin-bottom:22px;}
 
 /* ── OVERLAY (start / pause / win) ── */
 #overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.88);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;color:#fff;}
@@ -150,6 +188,7 @@ body.pvp-active #pvp-score-hud{display:block;}
     <div class="stat-block"><div class="s-label">Coins</div><div class="s-val" id="coins-val">0</div></div>
   </div>
   <div id="minimap-wrap"><div id="minimap-label">Tactical Map</div><canvas id="minimap" width="160" height="160"></canvas></div>
+  <button id="third-person-btn" onclick="toggleThirdPerson()">[ 3rd Person ]</button>
   <div id="kill-feed"></div>
   <div id="coin-pop"></div>
   <div id="reload-bar-wrap"><div id="reload-bar-label">Reloading</div><div id="reload-bar-outer"><div id="reload-bar"></div></div></div>
@@ -222,29 +261,45 @@ body.pvp-active #pvp-score-hud{display:block;}
 
 <!-- 1v1 PVP OVERLAY -->
 <div id="pvp-overlay">
-  <div id="pvp-name-screen">
-    <h2>1v1 MODE</h2>
-    <div class="pvp-sub">Set your callsign before entering the arena</div>
-    <input type="text" id="pvp-name-input" placeholder="Callsign..." maxlength="16" autocomplete="off" onkeydown="if(event.key==='Enter')pvpConfirmName()">
-    <button class="pvp-btn pvp-red" onclick="pvpConfirmName()">[ Confirm Callsign ]</button>
-    <button class="pvp-btn" onclick="closePvp()">[ Cancel ]</button>
-  </div>
-  <div id="pvp-lobby-screen" style="display:none">
+  <!-- LOBBY: main screen, shown immediately on open -->
+  <div id="pvp-lobby-screen">
     <h2>1v1 LOBBY</h2>
-    <div class="pvp-sub">Share your room ID — or enter theirs to challenge</div>
-    <div id="pvp-room-box"><div class="pvp-room-label">Your Room ID (tap to copy)</div><div id="pvp-room-code" onclick="pvpCopyId()">...</div></div>
-    <div id="pvp-status">Connecting...</div>
-    <input type="text" id="pvp-target-id" placeholder="Opponent Room ID" autocomplete="off" onkeydown="if(event.key==='Enter')pvpChallenge()">
-    <button class="pvp-btn pvp-red" onclick="pvpChallenge()">[ Request 1v1 ]</button>
-    <button class="pvp-btn" onclick="closePvp()">[ Cancel ]</button>
+    <div class="pvp-sub">Click a player to challenge — match starts automatically</div>
+    <div id="pvp-callsign-row">Playing as <span id="pvp-my-callsign">---</span> &nbsp;<span id="pvp-change-name" onclick="pvpChangeName()" title="Change callsign">✎</span></div>
+    <div id="pvp-lobby-status">Connecting...</div>
+    <div id="pvp-players-list"></div>
+    <div id="pvp-manual-toggle" onclick="pvpToggleManual()">▸ Connect by code</div>
+    <div id="pvp-manual-body">
+      <div id="pvp-room-box">
+        <div class="pvp-room-label">Your room code</div>
+        <div id="pvp-room-code-wrap">
+          <input type="text" id="pvp-room-code-input" maxlength="4" placeholder="1234" autocomplete="off" onkeydown="if(event.key==='Enter')pvpClaimCode()">
+          <button id="pvp-claim-btn" onclick="pvpClaimCode()">Set</button>
+        </div>
+        <div id="pvp-room-status"></div>
+      </div>
+      <input type="text" id="pvp-target-id" placeholder="Enter opponent's code" autocomplete="off" onkeydown="if(event.key==='Enter')pvpManualChallenge()">
+      <button class="pvp-btn pvp-red" onclick="pvpManualChallenge()">[ Connect ]</button>
+    </div>
+    <button class="pvp-btn" onclick="closePvp()" style="margin-top:12px">[ Leave ]</button>
   </div>
-  <div id="pvp-ready-screen" style="display:none">
-    <h2>OPPONENT FOUND</h2>
-    <div class="pvp-sub">Ready to fight?</div>
-    <span id="pvp-opp-label">???</span>
-    <div id="pvp-status">First to 5 kills wins</div>
-    <button class="pvp-btn pvp-red" onclick="pvpStartMatch()">[ Start Match ]</button>
-    <button class="pvp-btn" onclick="closePvp()">[ Cancel ]</button>
+  <!-- INCOMING CHALLENGE -->
+  <div id="pvp-challenge-screen" style="display:none">
+    <h2>INCOMING CHALLENGE</h2>
+    <span id="pvp-challenger-name">???</span>
+    <div class="pvp-wants-msg">wants to fight — match starts in 3s if you accept</div>
+    <div class="pvp-btn-row">
+      <button class="pvp-btn pvp-red" onclick="pvpAcceptChallenge()">[ Accept ]</button>
+      <button class="pvp-btn" onclick="pvpDeclineChallenge()">[ Decline ]</button>
+    </div>
+  </div>
+  <!-- COUNTDOWN (shown while match is about to start) -->
+  <div id="pvp-countdown-screen" style="display:none">
+    <h2>GET READY</h2>
+    <div class="pvp-sub">VS</div>
+    <span id="pvp-opp-label" style="display:block;font-size:28px;letter-spacing:5px;color:#fff;text-align:center;margin-bottom:20px;">???</span>
+    <div id="pvp-countdown-num" style="font-size:72px;font-weight:bold;color:#ff4136;text-align:center;text-shadow:0 0 24px rgba(255,65,54,.7);line-height:1;">3</div>
+    <div style="font-size:9px;letter-spacing:3px;color:#444;text-align:center;margin-top:12px;">First to 5 kills wins</div>
   </div>
 </div>
 <!-- PVP score HUD -->
@@ -269,6 +324,8 @@ body.pvp-active #pvp-score-hud{display:block;}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/MTLLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.4.7/peerjs.min.js"></script>
 <script>
 // ─── MAP ─────────────────────────────────────────────────────────────
@@ -435,7 +492,7 @@ const G={
      weapon:'m4a1',ammo:{},autoFireTimer:0,stepTimer:0,heat:0},
   recoil:{v:0,amount:0},sway:{x:0,y:0,vx:0,vy:0},
   keys:{},mouse:{dx:0,dy:0,locked:false,down:false},
-  yaw:0,pitch:0,
+  yaw:0,pitch:0,thirdPerson:false,
   enemies:[],projectiles:[],particles:[],weaponPickups:[],decals:[],
   lastTime:0,victoryChecked:false,bossSpawned:false,
   levelCfg:LEVEL_CONFIG[0], // set properly in initGame
@@ -469,6 +526,7 @@ const SFX=(()=>{
 // ─── THREE SETUP ─────────────────────────────────────────────────────
 const canvas=document.getElementById('game-canvas');
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.autoClear=false; // we clear manually so viewmodel renders on top
 renderer.setPixelRatio(1);
 renderer.setSize(window.innerWidth,window.innerHeight);
 renderer.shadowMap.enabled=false;
@@ -479,6 +537,115 @@ const ambLight=new THREE.AmbientLight(0xffffff,2.0); scene.add(ambLight);
 const sun=new THREE.DirectionalLight(0xfffbe8,1.5); sun.position.set(40,80,30); sun.castShadow=false; scene.add(sun);
 const hemi=new THREE.HemisphereLight(0xffffff,0xcccccc,1.0);scene.add(hemi);
 // Two environment groups — toggle visible to switch between bunker (indoor) and hills (outdoor)
+// ─── VIEWMODEL (gun in hand) ──────────────────────────────────────────
+const vmScene=new THREE.Scene();
+const vmCam=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,0.01,10);
+vmScene.add(new THREE.AmbientLight(0xffffff,1.6));
+const vmSun=new THREE.DirectionalLight(0xfffbe8,1.2);vmSun.position.set(1,2,1);vmScene.add(vmSun);
+
+const VM={
+  meshes:{},      // weapon id → THREE.Group
+  current:null,   // active mesh
+  weapon:null,    // active weapon id
+  recoilZ:0,      // recoil push-back
+  bobT:0,         // bob timer
+  loaded:false,
+};
+
+const VM_MAP={
+  m4a1:'AssaultRifle_1', shotgun:'Shotgun_1',
+  sniper:'SniperRifle_1', lmg:'SubmachineGun_1', rpg:'AssaultRifle_1',
+};
+// Position + scale per weapon [x, y, z, scaleX, scaleY, scaleZ, rotY]
+const VM_CFG={
+  m4a1:      [0.28,-0.23,-0.45, 0.55,0.55,0.55,  0.18],
+  shotgun:   [0.28,-0.22,-0.42, 0.60,0.60,0.60,  0.18],
+  sniper:    [0.26,-0.22,-0.52, 0.38,0.38,0.38,  0.14],
+  lmg:       [0.30,-0.24,-0.44, 0.48,0.48,0.48,  0.20],
+  rpg:       [0.28,-0.23,-0.45, 0.55,0.55,0.55,  0.18],
+};
+
+function vmLoad(weaponId,file,onDone){
+  const mtl=new THREE.MTLLoader();
+  mtl.setPath('assets/guns/');
+  mtl.load(file+'.mtl',mats=>{
+    mats.preload();
+    const obj=new THREE.OBJLoader();
+    obj.setMaterials(mats);
+    obj.setPath('assets/guns/');
+    obj.load(file+'.obj',group=>{
+      // Flatten MeshPhongMaterial → MeshLambertMaterial (matches game style)
+      group.traverse(c=>{
+        if(c.isMesh){
+          const m=c.material;
+          c.material=new THREE.MeshLambertMaterial({
+            color:m.color||new THREE.Color(0x222222),
+            map:m.map||null,
+          });
+          c.castShadow=false;c.receiveShadow=false;
+        }
+      });
+      group.visible=false;
+      vmScene.add(group);
+      VM.meshes[weaponId]=group;
+      onDone&&onDone();
+    });
+  });
+}
+
+function initViewmodels(){
+  // weapons sharing a file (rpg → AssaultRifle_1) are wired up in onDone synchronously
+  const loadList=[
+    {wid:'m4a1',   file:'AssaultRifle_1',  alias:'rpg'},
+    {wid:'shotgun',file:'Shotgun_1'},
+    {wid:'sniper', file:'SniperRifle_1'},
+    {wid:'lmg',    file:'SubmachineGun_1'},
+  ];
+  let pending=loadList.length;
+  loadList.forEach(({wid,file,alias})=>{
+    vmLoad(wid,file,()=>{
+      if(alias)VM.meshes[alias]=VM.meshes[wid]; // share mesh synchronously
+      pending--;
+      if(pending===0)VM.loaded=true;
+    });
+  });
+}
+
+function vmEquip(weaponId){
+  const mesh=VM.meshes[weaponId];
+  if(!mesh)return; // model not yet loaded — will retry via initGame vmEquip call
+  if(VM.weapon===weaponId&&VM.current===mesh)return;
+  VM.weapon=weaponId;
+  if(VM.current&&VM.current!==mesh){VM.current.visible=false;}
+  VM.current=null; // clear before positioning to avoid stale reference
+  const cfg=VM_CFG[weaponId]||VM_CFG.m4a1;
+  mesh.position.set(cfg[0],cfg[1],cfg[2]);
+  mesh.scale.set(cfg[3],cfg[4],cfg[5]);
+  mesh.rotation.y=Math.PI+cfg[6];
+  mesh.rotation.x=0;mesh.rotation.z=0;
+  mesh.visible=true;
+  VM.current=mesh;
+  VM.recoilZ=0;
+}
+
+function updateViewmodel(dt){
+  if(!VM.loaded||!VM.current||G.thirdPerson)return;
+  // Bob while moving on ground
+  const moving=Object.keys(G.keys).some(k=>['KeyW','KeyS','KeyA','KeyD'].includes(k)&&G.keys[k]);
+  VM.bobT+=dt*(moving?4:1.5);
+  const bobY=moving&&G.p.onGround?Math.sin(VM.bobT)*0.008:0;
+  const bobX=moving&&G.p.onGround?Math.sin(VM.bobT*0.5)*0.004:0;
+  // Recoil decay
+  VM.recoilZ*=0.82;
+  const cfg=VM_CFG[VM.weapon]||VM_CFG.m4a1;
+  VM.current.position.set(cfg[0]+bobX, cfg[1]+bobY, cfg[2]-VM.recoilZ);
+  VM.current.rotation.x=VM.recoilZ*2.5;
+}
+
+function vmRecoil(){
+  VM.recoilZ=Math.min(VM.recoilZ+0.018,0.06);
+}
+
 const bunkerGroup=new THREE.Group(); scene.add(bunkerGroup);
 const hillsGroup=new THREE.Group(); hillsGroup.visible=false; scene.add(hillsGroup);
 const bunkerWallMeshes=[], hillsWallMeshes=[];
@@ -759,6 +926,7 @@ function pickupWeaponFloor(type){
   STORE.ownedWeapons.add(type);
   G.p.weapon=type;G.p.reloading=false;
   document.getElementById('reload-bar-wrap').classList.remove('show');
+  vmEquip(type);
   SFX.pickup();notify('▶ '+w.name+' equipped',w.badgeColor,2200);updateHUD();
 }
 
@@ -945,7 +1113,7 @@ function shoot(){
     G.projectiles.push(makeProjectile(cam.position.clone().add(dir.clone().multiplyScalar(0.6)).add(new THREE.Vector3(0,-0.1,0)),dir,false,true));
     screenFlash('rgba(255,120,0,0.18)');G.recoil.v+=w.recoil;if(!wa.mag)reload();return;
   }
-  wa.mag--;updateHUD();SFX.shot(wKey);G.recoil.v+=w.recoil;G.p.heat=Math.min(1,G.p.heat+0.2);screenFlash('rgba(255,255,180,0.10)');
+  wa.mag--;updateHUD();SFX.shot(wKey);G.recoil.v+=w.recoil;G.p.heat=Math.min(1,G.p.heat+0.2);screenFlash('rgba(255,255,180,0.10)');vmRecoil();
   const dmgMult=STORE.upgrades.has('stopping_power')?1.25:1;
   const rc=new THREE.Raycaster(),aliveMeshes=G.enemies.filter(e=>e.alive).map(e=>e.mesh);
   const baseSpread=w.spread+G.p.heat*0.04;
@@ -1291,6 +1459,23 @@ function updatePlayer(dt){
   const bob=G.p.onGround?Math.sin(Date.now()*(spd>6?9:6)*0.001)*(len>0?(spd>6?0.06:0.035):0):0;
   cam.position.y=ny+bob;
 
+  // 3rd-person camera offset — pull back 3.5 units behind player, 1.5 up
+  if(G.thirdPerson){
+    const px=cam.position.x, py=cam.position.y, pz=cam.position.z;
+    const pullDist=3.5, pullUp=1.5;
+    const ox=Math.sin(G.yaw)*pullDist, oz=Math.cos(G.yaw)*pullDist;
+    // clamp against walls: step back in increments
+    let bestDist=pullDist;
+    for(let d=pullDist;d>0.5;d-=0.5){
+      const tx=px+Math.sin(G.yaw)*d, tz=pz+Math.cos(G.yaw)*d;
+      const col=moveCol({x:tx,y:py,z:tz},0,0);
+      if(Math.abs(col.x-tx)<0.05&&Math.abs(col.z-tz)<0.05){bestDist=d;break;}
+    }
+    cam.position.x=px+Math.sin(G.yaw)*bestDist;
+    cam.position.z=pz+Math.cos(G.yaw)*bestDist;
+    cam.position.y=py+pullUp;
+  }
+
   if(len>0&&G.p.onGround){G.p.stepTimer-=dt;if(G.p.stepTimer<=0){SFX.step();G.p.stepTimer=spd>6?0.32:0.46;}}else if(G.p.onGround)G.p.stepTimer=0;
   if(G.p.weapon==='lmg'&&(G.mouse.down||TCH.fire)&&G.mouse.locked){G.p.autoFireTimer-=dt;if(G.p.autoFireTimer<=0){shoot();G.p.autoFireTimer=0.085;}}
   if(G.p.reloading){G.p.reloadTimer-=dt*1000;document.getElementById('reload-bar').style.width=(1-G.p.reloadTimer/G.p.reloadDuration)*100+'%';if(G.p.reloadTimer<=0)finishReload();}
@@ -1298,6 +1483,13 @@ function updatePlayer(dt){
   // Shield regen: regens 4s after last hit, 8/sec, up to maxShield
   if(G.p.shieldRegenTimer>0){G.p.shieldRegenTimer-=dt;}
   else if(G.p.shield<G.p.maxShield){G.p.shield=Math.min(G.p.maxShield,G.p.shield+8*dt);updateHUD();}
+}
+
+function toggleThirdPerson(){
+  G.thirdPerson=!G.thirdPerson;
+  const btn=document.getElementById('third-person-btn');
+  if(G.thirdPerson){btn.classList.add('active');btn.textContent='[ 1st Person ]';}
+  else{btn.classList.remove('active');btn.textContent='[ 3rd Person ]';}
 }
 
 // ─── SHOP ────────────────────────────────────────────────────────────
@@ -1403,7 +1595,7 @@ function initGame(){
   G.p.armorHp=armorAmounts[STORE.armor];G.p.maxArmorHp=armorAmounts[STORE.armor];
 
   // Weapon ammo
-  G.p.weapon='m4a1';
+  G.p.weapon='m4a1';vmEquip('m4a1');
   Object.keys(WEAPONS).forEach(wKey=>{
     if(STORE.ownedWeapons.has(wKey)){
       const w=WEAPONS[wKey];
@@ -1513,70 +1705,397 @@ function loop(ts){
     }
   }
   drawMinimap();vcAccum+=dt;if(vcAccum>1){vcAccum=0;checkVictory();}
-  renderer.render(scene,cam);requestAnimationFrame(loop);
+  updateViewmodel(dt); // update position before render so it's never a frame stale
+  renderer.clear();   // explicit clear replaces autoClear
+  renderer.render(scene,cam);
+  // Render gun viewmodel on top (clear depth so it never clips through walls)
+  if(VM.loaded&&VM.current&&!G.thirdPerson){
+    renderer.clearDepth();
+    renderer.render(vmScene,vmCam);
+  }
+  requestAnimationFrame(loop);
 }
 
 // ─── 1v1 PVP ─────────────────────────────────────────────────────────
+// Lobby uses PeerJS relay: first player claims fixed peer ID as "host"
+// and relays the player list + challenge messages to all clients.
+// All players also have a game peer (random ID) for direct 1v1 connections.
+const LOBBY_ID='sz-lobby-v4';
 const PVP={
-  active:false,peer:null,conn:null,
-  myName:'',oppName:'',
-  oppMesh:null,oppPos:new THREE.Vector3(40,0,12),oppRot:0,
+  active:false,
+  peer:null,       // game peer (random ID) — used for 1v1 connection
+  hostPeer:null,   // lobby host peer (fixed ID) — only set if we're the host
+  lobbyConn:null,  // our connection to the lobby host (if we're a client)
+  lobbyClients:{}, // {peerId:{conn,name}} — if we're host
+  conn:null,       // active 1v1 game connection
+  myName:'',myPeerId:'',myRoomCode:'',
+  oppName:'',oppPeerId:'', // current opponent info
+  isLobbyHost:false,
+  lobbyPlayers:[],
+  pendingTargetPeerId:null, // peer we've challenged (awaiting response)
   myKills:0,oppKills:0,lastSend:0,isHost:false,
-  oppHp:100,
+  oppMesh:null,oppPos:new THREE.Vector3(40,0,12),oppRot:0,oppHp:100,
 };
 const PVP_WIN=5;
 
 function pvpShowScreen(id){
-  ['pvp-name-screen','pvp-lobby-screen','pvp-ready-screen'].forEach(s=>{
+  ['pvp-lobby-screen','pvp-challenge-screen','pvp-countdown-screen'].forEach(s=>{
     document.getElementById(s).style.display=(s===id)?'':'none';
   });
 }
 
-function openPvp(){
-  document.getElementById('pvp-overlay').classList.add('show');
+function pvpAutoName(){
   const saved=localStorage.getItem('sz_pvp_name');
-  if(saved)document.getElementById('pvp-name-input').value=saved;
-  pvpShowScreen('pvp-name-screen');
+  if(saved)return saved;
+  const tags=['GHOST','WOLF','HAWK','COBRA','VIPER','STORM','IRON','ALPHA','ROGUE','BLADE'];
+  const n=tags[Math.floor(Math.random()*tags.length)]+'_'+Math.floor(Math.random()*9000+1000);
+  localStorage.setItem('sz_pvp_name',n);return n;
+}
+
+function pvpChangeName(){
+  const n=prompt('New callsign:',PVP.myName||'');
+  if(!n||!n.trim())return;
+  PVP.myName=n.trim().slice(0,16).toUpperCase();
+  localStorage.setItem('sz_pvp_name',PVP.myName);
+  document.getElementById('pvp-my-callsign').textContent=PVP.myName;
+}
+
+function pvpToggleManual(){
+  const b=document.getElementById('pvp-manual-body');
+  const t=document.getElementById('pvp-manual-toggle');
+  const open=b.style.display==='block';
+  b.style.display=open?'none':'block';
+  t.textContent=open?'▸ Manual connect':'▾ Manual connect';
+}
+
+function pvpSetRoomStatus(msg,color){
+  const el=document.getElementById('pvp-room-status');
+  if(el){el.textContent=msg;el.style.color=color||'#666';}
+}
+
+function pvpInitPeer(code,onSuccess,onTaken){
+  if(PVP.peer){try{PVP.peer.destroy();}catch(e){}}PVP.peer=null;
+  const peer=new Peer('sz-'+code,{debug:0});PVP.peer=peer;
+  peer.on('open',id=>{
+    PVP.myPeerId=id;PVP.myRoomCode=code;
+    peer.on('connection',conn=>{
+      if(PVP.oppPeerId&&conn.peer===PVP.oppPeerId)pvpBind(conn,false);
+    });
+    onSuccess&&onSuccess(code);
+  });
+  peer.on('error',err=>{
+    if(err.type==='unavailable-id'){onTaken&&onTaken();}
+    else document.getElementById('pvp-lobby-status').textContent='Error: '+err.type;
+  });
+}
+
+function pvpClaimCode(){
+  const raw=document.getElementById('pvp-room-code-input').value.trim();
+  if(!/^\d{4}$/.test(raw)){pvpSetRoomStatus('Enter exactly 4 digits','#ff4136');return;}
+  const btn=document.getElementById('pvp-claim-btn');
+  btn.disabled=true;btn.textContent='...';
+  pvpSetRoomStatus('Checking...','#666');
+  pvpInitPeer(raw,
+    code=>{
+      pvpSetRoomStatus('✓ Code '+code+' is yours!','#2ecc40');
+      btn.disabled=false;btn.textContent='Set';
+      pvpTryBecomeHost();
+    },
+    ()=>{
+      pvpSetRoomStatus('✗ '+raw+' is taken — try another','#ff4136');
+      btn.disabled=false;btn.textContent='Set';
+    }
+  );
+}
+
+function openPvp(){
+  PVP.myName=pvpAutoName();
+  document.getElementById('pvp-my-callsign').textContent=PVP.myName;
+  document.getElementById('pvp-overlay').classList.add('show');
+  pvpShowScreen('pvp-lobby-screen');
+  document.getElementById('pvp-lobby-status').textContent='Connecting...';
+  document.getElementById('pvp-room-code-input').value='';
+  pvpSetRoomStatus('','#666');
+  document.getElementById('pvp-players-list').innerHTML='';
+  // Assign a random code automatically; user can change it via the input
+  const autoCode=String(Math.floor(Math.random()*9000)+1000);
+  document.getElementById('pvp-room-code-input').value=autoCode;
+  pvpInitPeer(autoCode,
+    code=>{
+      pvpSetRoomStatus('✓ Code '+code+' auto-assigned','#2ecc40');
+      pvpTryBecomeHost();
+    },
+    ()=>{
+      // Auto-code collision — try another random one silently
+      const retry=String(Math.floor(Math.random()*9000)+1000);
+      document.getElementById('pvp-room-code-input').value=retry;
+      pvpInitPeer(retry,code=>{pvpSetRoomStatus('✓ Code '+code+' auto-assigned','#2ecc40');pvpTryBecomeHost();},()=>{});
+    }
+  );
 }
 
 function closePvp(){
   document.getElementById('pvp-overlay').classList.remove('show');
+  pvpCleanupLobby();
   if(PVP.conn){try{PVP.conn.close();}catch(e){}}PVP.conn=null;
   if(PVP.peer){try{PVP.peer.destroy();}catch(e){}}PVP.peer=null;
-  PVP.active=false;
+  PVP.active=false;PVP.oppName='';PVP.oppPeerId='';PVP.pendingTargetPeerId=null;
   if(PVP.oppMesh){scene.remove(PVP.oppMesh);PVP.oppMesh=null;}
   document.body.classList.remove('pvp-active');
 }
 
+function pvpCleanupLobby(){
+  Object.values(PVP.lobbyClients).forEach(c=>{try{c.conn.close();}catch(e){}});
+  PVP.lobbyClients={};
+  if(PVP.lobbyConn){try{PVP.lobbyConn.close();}catch(e){}}PVP.lobbyConn=null;
+  if(PVP.hostPeer){try{PVP.hostPeer.destroy();}catch(e){}}PVP.hostPeer=null;
+  PVP.isLobbyHost=false;PVP.lobbyPlayers=[];
+}
+
 function pvpCopyId(){
-  const code=document.getElementById('pvp-room-code').textContent;
-  navigator.clipboard&&navigator.clipboard.writeText(code).then(()=>notify('Room ID copied','#ffdc00',1500));
+  const code=PVP.myRoomCode||document.getElementById('pvp-room-code-input').value;
+  if(code)navigator.clipboard&&navigator.clipboard.writeText(code).then(()=>notify('Code '+code+' copied','#ffdc00',1500));
 }
 
-function pvpConfirmName(){
-  const n=document.getElementById('pvp-name-input').value.trim().slice(0,16);
-  if(!n){document.getElementById('pvp-name-input').style.borderColor='rgba(255,0,0,0.8)';return;}
-  PVP.myName=n;localStorage.setItem('sz_pvp_name',n);
-  pvpShowScreen('pvp-lobby-screen');
-  document.getElementById('pvp-room-code').textContent='...';
-  document.getElementById('pvp-status').textContent='Connecting to matchmaking...';
-  const peer=new Peer({debug:0});PVP.peer=peer;
-  peer.on('open',id=>{
-    document.getElementById('pvp-room-code').textContent=id;
-    document.getElementById('pvp-status').textContent='Waiting for opponent to connect...';
+// pvpConfirmName removed — openPvp now handles peer init directly
+
+// ─ Lobby host logic ────────────────────────────────────────────────────
+function pvpTryBecomeHost(){
+  if(PVP.hostPeer)return;
+  const hp=new Peer(LOBBY_ID,{debug:0});PVP.hostPeer=hp;
+  hp.on('open',()=>{
+    PVP.isLobbyHost=true;PVP.lobbyClients={};
+    PVP.lobbyPlayers=[{name:PVP.myName,peerId:PVP.myPeerId}];
+    document.getElementById('pvp-lobby-status').textContent='Online';
+    pvpRenderPlayerList(PVP.lobbyPlayers);
+    hp.on('connection',pvpHandleNewClient);
   });
-  peer.on('connection',conn=>{pvpBind(conn,false);});
-  peer.on('error',err=>{document.getElementById('pvp-status').textContent='Error: '+err.type;});
+  hp.on('error',err=>{
+    PVP.hostPeer=null;
+    if(err.type==='unavailable-id')pvpJoinAsClient();
+    // other errors: retry
+    else setTimeout(pvpTryBecomeHost,2000);
+  });
 }
 
-function pvpChallenge(){
-  const tid=document.getElementById('pvp-target-id').value.trim();
-  if(!tid||!PVP.peer)return;
-  document.getElementById('pvp-status').textContent='Connecting to opponent...';
+function pvpHandleNewClient(conn){
+  PVP.lobbyClients[conn.peer]={conn,name:'?'};
+  conn.on('data',d=>pvpHostOnData(conn,d));
+  conn.on('close',()=>{
+    delete PVP.lobbyClients[conn.peer];
+    pvpHostRebuildAndBroadcast();
+  });
+}
+
+function pvpHostOnData(conn,d){
+  switch(d.type){
+    case 'register':
+      PVP.lobbyClients[conn.peer]={conn,name:d.name};
+      pvpHostRebuildAndBroadcast();
+      break;
+    case 'challenge':{
+      // Challenger is a client, target may be host or another client
+      if(d.targetPeerId===PVP.myPeerId){
+        // Host is being challenged
+        PVP.oppName=d.fromName;PVP.oppPeerId=conn.peer;
+        pvpShowScreen('pvp-challenge-screen');
+        document.getElementById('pvp-challenger-name').textContent=d.fromName.toUpperCase();
+      } else {
+        const t=PVP.lobbyClients[d.targetPeerId];
+        if(t&&t.conn.open){
+          t.conn.send({type:'challenge_incoming',fromName:d.fromName,fromPeerId:conn.peer});
+        } else {
+          conn.send({type:'challenge_result',accepted:false,reason:'offline'});
+        }
+      }
+      break;
+    }
+    case 'challenge_response':{
+      // Accepter is a client; find the original challenger
+      if(d.accepted){
+        if(d.challengerPeerId===PVP.myPeerId){
+          // Host challenged this client and they accepted
+          PVP.oppName=PVP.lobbyClients[conn.peer]?.name||'?';
+          PVP.oppPeerId=conn.peer;
+          pvpDoConnectToOpponent();
+          pvpShowCountdown(PVP.oppName);
+        } else {
+          const challenger=PVP.lobbyClients[d.challengerPeerId];
+          if(challenger&&challenger.conn.open){
+            challenger.conn.send({type:'challenge_result',accepted:true,fromPeerId:conn.peer,fromName:PVP.lobbyClients[conn.peer]?.name||'?'});
+          }
+        }
+      } else {
+        if(d.challengerPeerId===PVP.myPeerId){
+          pvpShowScreen('pvp-lobby-screen');
+          notify('Challenge declined','#ff4136',2000);
+        } else {
+          const challenger=PVP.lobbyClients[d.challengerPeerId];
+          if(challenger&&challenger.conn.open)challenger.conn.send({type:'challenge_result',accepted:false,reason:'declined'});
+        }
+      }
+      break;
+    }
+  }
+}
+
+function pvpHostRebuildAndBroadcast(){
+  const players=[{name:PVP.myName,peerId:PVP.myPeerId}];
+  Object.values(PVP.lobbyClients).forEach(c=>players.push({name:c.name,peerId:c.conn.peer}));
+  PVP.lobbyPlayers=players;
+  pvpRenderPlayerList(players);
+  Object.values(PVP.lobbyClients).forEach(c=>{
+    if(c.conn.open)c.conn.send({type:'player_list',players});
+  });
+}
+
+// ─ Lobby client logic ──────────────────────────────────────────────────
+function pvpJoinAsClient(){
+  if(!PVP.peer||PVP.lobbyConn)return;
+  const conn=PVP.peer.connect(LOBBY_ID,{reliable:true});
+  PVP.lobbyConn=conn;
+  conn.on('open',()=>{
+    conn.send({type:'register',name:PVP.myName,peerId:PVP.myPeerId});
+    document.getElementById('pvp-lobby-status').textContent='Online';
+  });
+  conn.on('data',pvpClientOnData);
+  conn.on('close',()=>{
+    PVP.lobbyConn=null;
+    document.getElementById('pvp-lobby-status').textContent='Reconnecting...';
+    setTimeout(pvpTryBecomeHost,1500);
+  });
+  conn.on('error',()=>{PVP.lobbyConn=null;setTimeout(pvpJoinAsClient,2000);});
+}
+
+function pvpClientOnData(d){
+  switch(d.type){
+    case 'player_list':
+      PVP.lobbyPlayers=d.players;
+      pvpRenderPlayerList(d.players);
+      break;
+    case 'challenge_incoming':
+      PVP.oppName=d.fromName;PVP.oppPeerId=d.fromPeerId;
+      pvpShowScreen('pvp-challenge-screen');
+      document.getElementById('pvp-challenger-name').textContent=d.fromName.toUpperCase();
+      break;
+    case 'challenge_result':
+      if(d.accepted){
+        PVP.oppName=d.fromName;PVP.oppPeerId=d.fromPeerId;
+        pvpDoConnectToOpponent();
+        pvpShowCountdown(d.fromName);
+      } else {
+        PVP.pendingTargetPeerId=null;
+        pvpShowScreen('pvp-lobby-screen');
+        document.getElementById('pvp-lobby-status').textContent='Online';
+        notify(d.reason==='declined'?'Challenge declined':'Player unavailable','#ff4136',2000);
+      }
+      break;
+  }
+}
+
+// ─ Player list UI ──────────────────────────────────────────────────────
+function pvpRenderPlayerList(players){
+  const el=document.getElementById('pvp-players-list');
+  if(!el)return;
+  el.innerHTML='';
+  players.forEach(p=>{
+    const isMe=p.peerId===PVP.myPeerId;
+    const row=document.createElement('div');
+    row.className='pvp-player-row'+(isMe?'':' pvp-other');
+    const safeName=p.name.replace(/[<>"']/g,'').toUpperCase();
+    const safePeerId=p.peerId.replace(/['"]/g,'');
+    const safePeerIdJs=JSON.stringify(safePeerId);
+    const safeNameJs=JSON.stringify(p.name);
+    row.innerHTML=`<div class="dot"></div><div class="pname">${safeName}</div>`+
+      (isMe?`<span class="me-tag">YOU</span>`:`<button class="chbtn" onclick="pvpRequestChallenge(${safePeerIdJs},${safeNameJs})">[ Challenge ]</button>`);
+    el.appendChild(row);
+  });
+}
+
+// ─ Challenge flow ──────────────────────────────────────────────────────
+function pvpRequestChallenge(targetPeerId,targetName){
+  if(!PVP.peer||!PVP.myPeerId)return;
+  PVP.pendingTargetPeerId=targetPeerId;
+  document.getElementById('pvp-lobby-status').textContent='Challenging '+targetName.toUpperCase()+'...';
+  const msg={type:'challenge',fromName:PVP.myName,fromPeerId:PVP.myPeerId,targetPeerId};
+  if(PVP.isLobbyHost){
+    // Target is a client; relay directly
+    const t=PVP.lobbyClients[targetPeerId];
+    if(t&&t.conn.open){
+      PVP.oppName=targetName;PVP.oppPeerId=targetPeerId;
+      t.conn.send({type:'challenge_incoming',fromName:PVP.myName,fromPeerId:PVP.myPeerId});
+    } else {
+      pvpShowScreen('pvp-lobby-screen');
+      notify('Player unavailable','#ff4136',2000);
+    }
+  } else if(PVP.lobbyConn&&PVP.lobbyConn.open){
+    PVP.lobbyConn.send(msg);
+  }
+}
+
+function pvpAcceptChallenge(){
+  const challengerPeerId=PVP.oppPeerId;
+  const resp={type:'challenge_response',accepted:true,challengerPeerId,fromPeerId:PVP.myPeerId};
+  if(PVP.isLobbyHost){
+    PVP.oppPeerId=challengerPeerId;
+    const c=PVP.lobbyClients[challengerPeerId];
+    if(c&&c.conn.open)c.conn.send({type:'challenge_result',accepted:true,fromPeerId:PVP.myPeerId,fromName:PVP.myName});
+  } else if(PVP.lobbyConn&&PVP.lobbyConn.open){
+    PVP.lobbyConn.send(resp);
+  }
+  // Show countdown immediately — match auto-starts when P2P hello completes
+  pvpShowCountdown(PVP.oppName||'???');
+}
+
+function pvpDeclineChallenge(){
+  const challengerPeerId=PVP.oppPeerId;
+  const resp={type:'challenge_response',accepted:false,challengerPeerId,fromPeerId:PVP.myPeerId};
+  if(PVP.isLobbyHost){
+    const c=PVP.lobbyClients[challengerPeerId];
+    if(c&&c.conn.open)c.conn.send({type:'challenge_result',accepted:false,reason:'declined'});
+  } else if(PVP.lobbyConn&&PVP.lobbyConn.open){
+    PVP.lobbyConn.send(resp);
+  }
+  PVP.oppName='';PVP.oppPeerId='';
+  pvpShowScreen('pvp-lobby-screen');
+}
+
+function pvpCancelChallenge(){
+  PVP.pendingTargetPeerId=null;PVP.oppPeerId='';
+  pvpShowScreen('pvp-lobby-screen');
+}
+
+function pvpShowCountdown(oppName){
+  pvpShowScreen('pvp-countdown-screen');
+  document.getElementById('pvp-opp-label').textContent=oppName.toUpperCase();
+  let n=3;
+  const el=document.getElementById('pvp-countdown-num');
+  el.textContent=n;
+  const tick=setInterval(()=>{
+    n--;
+    if(n>0){el.textContent=n;}
+    else{clearInterval(tick);}
+  },1000);
+}
+
+function pvpDoConnectToOpponent(){
+  if(!PVP.peer||!PVP.oppPeerId)return;
+  const conn=PVP.peer.connect(PVP.oppPeerId,{reliable:true});
+  pvpBind(conn,true);
+}
+
+// ─ Manual room-ID connect (legacy fallback) ────────────────────────────
+function pvpManualChallenge(){
+  const raw=document.getElementById('pvp-target-id').value.trim();
+  if(!raw||!PVP.peer)return;
+  // Accept bare 4-digit code or full sz-XXXX peer ID
+  const tid=raw.startsWith('sz-')?raw:'sz-'+raw;
+  document.getElementById('pvp-lobby-status').textContent='Connecting...';
   const conn=PVP.peer.connect(tid,{reliable:true});
   pvpBind(conn,true);
 }
 
+// ─ Game connection ─────────────────────────────────────────────────────
 function pvpBind(conn,isChallenger){
   PVP.conn=conn;PVP.isHost=!isChallenger;
   conn.on('open',()=>{conn.send({type:'hello',name:PVP.myName});});
@@ -1589,14 +2108,16 @@ function pvpOnData(d){
   switch(d.type){
     case 'hello':
       PVP.oppName=d.name;
-      document.getElementById('pvp-opp-label').textContent=d.name.toUpperCase();
-      pvpShowScreen('pvp-ready-screen');
-      document.getElementById('pvp-status').textContent='First to '+PVP_WIN+' kills wins';
-      // Both sides send hello so the connector also gets here
-      if(!PVP.isHost)PVP.conn.send({type:'hello',name:PVP.myName});
+      pvpShowCountdown(d.name);
+      if(!PVP.isHost){
+        // Challenger auto-starts: send start signal after countdown
+        PVP.conn.send({type:'hello',name:PVP.myName});
+        setTimeout(()=>{if(PVP.conn&&PVP.conn.open)pvpStartMatch();},3000);
+      }
       break;
     case 'start':
-      pvpBeginMatch(false);
+      // Host receives start from challenger — begin as non-host after countdown
+      setTimeout(()=>pvpBeginMatch(false),3000);
       break;
     case 'pos':
       PVP.oppPos.set(d.x,0,d.z);PVP.oppRot=d.ry;
@@ -1604,7 +2125,7 @@ function pvpOnData(d){
     case 'hit':
       takeDamage(d.dmg);
       break;
-    case 'kill': // opponent died → WE scored
+    case 'kill':
       PVP.myKills++;pvpUpdateHUD();
       if(PVP.myKills>=PVP_WIN){pvpEnd('YOU WIN!',true);return;}
       notify('☠ Enemy eliminated','#2ecc40',1800);
@@ -1616,26 +2137,23 @@ function pvpOnData(d){
 }
 
 function pvpStartMatch(){
-  PVP.isHost=true;
   if(PVP.conn&&PVP.conn.open)PVP.conn.send({type:'start'});
   pvpBeginMatch(true);
 }
 
 function pvpBeginMatch(asHost){
+  pvpCleanupLobby(); // leave lobby while in match
   document.getElementById('pvp-overlay').classList.remove('show');
   PVP.active=true;PVP.myKills=0;PVP.oppKills=0;PVP.isHost=asHost;
   document.body.classList.add('pvp-active');
   pvpUpdateHUD();
-  // Start game, strip AI enemies
   setEnvironment('bunker');
   initGame();G.enemies=[];
   G.running=true;G.paused=false;G.lastTime=performance.now();
-  // Place player — host at far end, guest at near end
   const myZ=asHost?17*CS:3*CS;
   const oppZ=asHost?3*CS:17*CS;
   cam.position.set(COLS*CS/2,G.p.height,myZ);G.p.pos.set(COLS*CS/2,0,myZ);
   PVP.oppPos.set(COLS*CS/2,0,oppZ);
-  // Opponent avatar
   if(PVP.oppMesh){scene.remove(PVP.oppMesh);PVP.oppMesh=null;}
   PVP.oppMesh=makeEnemyMesh(0xcc4400,3);
   PVP.oppMesh.position.set(COLS*CS/2,0,oppZ);
@@ -1646,7 +2164,6 @@ function pvpBeginMatch(asHost){
 }
 
 function pvpDead(){
-  // We died — tell opponent they scored, track opp kills here too
   G.p.hp=100;updateHUD();
   if(PVP.conn&&PVP.conn.open)PVP.conn.send({type:'kill'});
   PVP.oppKills++;pvpUpdateHUD();
@@ -1676,11 +2193,11 @@ function pvpEnd(reason,iWon){
   document.body.classList.remove('pvp-active');
   G.running=false;
   if(PVP.conn){try{PVP.conn.send({type:'end',reason});}catch(e){}try{PVP.conn.close();}catch(e){}}
-  if(PVP.peer){try{PVP.peer.destroy();}catch(e){}}
-  PVP.conn=null;PVP.peer=null;
+  PVP.conn=null;
+  if(PVP.peer){try{PVP.peer.destroy();}catch(e){}}PVP.peer=null;
   if(PVP.oppMesh){scene.remove(PVP.oppMesh);PVP.oppMesh=null;}
   document.exitPointerLock&&document.exitPointerLock();
-  const title=iWon===true?'VICTORY':iWon===false?'MATCH OVER':'MATCH OVER';
+  const title=iWon===true?'VICTORY':'MATCH OVER';
   showOverlay(title,'1v1 Result',
     `<span style="color:#ffdc00">You: ${PVP.myKills} kills</span><br><span style="color:#aaa">${PVP.oppName||'Opponent'}: ${PVP.oppKills} kills</span><br><br><span style="color:#888">${reason||''}</span>`,
     'Main Menu',()=>{
@@ -1713,6 +2230,9 @@ if(btnFs){
 }
 
 // ─── BOOT ────────────────────────────────────────────────────────────
+// Preload gun models as soon as the page is ready
+initViewmodels();
+
 document.getElementById('start-btn').addEventListener('click',()=>{
   document.getElementById('overlay').classList.add('hidden');
   if(IS_TOUCH)tryFullscreen();
@@ -1722,7 +2242,11 @@ document.getElementById('start-btn').addEventListener('click',()=>{
   setTimeout(()=>notify('LEVEL '+STORE.level+' — Enemies: '+cfg.gunName,'#44ccff',3500),800);
   requestAnimationFrame(loop);
 });
-window.addEventListener('resize',()=>{cam.aspect=window.innerWidth/window.innerHeight;cam.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);checkOrient();});
+window.addEventListener('resize',()=>{
+  cam.aspect=window.innerWidth/window.innerHeight;cam.updateProjectionMatrix();
+  vmCam.aspect=window.innerWidth/window.innerHeight;vmCam.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);checkOrient();
+});
 </script>
 </body>
 </html>
