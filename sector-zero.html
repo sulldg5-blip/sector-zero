@@ -447,7 +447,7 @@ const floorTex=makeTex('floor');floorTex.repeat.set(10,10);
 const ceilTex=makeTex('ceil');ceilTex.repeat.set(10,10);
 const rockTex=makeTex('rock');rockTex.repeat.set(1,1);
 const wallMat=new THREE.MeshLambertMaterial({map:wallTex,color:0xdddddd});
-const floorMat=new THREE.MeshLambertMaterial({map:floorTex,color:0xbbbbbb});
+const floorMat=new THREE.MeshLambertMaterial({map:floorTex,color:0x888888});
 const ceilMat=new THREE.MeshLambertMaterial({map:ceilTex,color:0x888899});
 const planeGeo=new THREE.PlaneGeometry(COLS*CS,ROWS*CS);
 const floorM=new THREE.Mesh(planeGeo,floorMat);floorM.rotation.x=-Math.PI/2;floorM.position.set(COLS*CS/2,0,ROWS*CS/2);bunkerGroup.add(floorM);
