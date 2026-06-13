@@ -1801,7 +1801,10 @@ function pvpInitPeer(code,onSuccess,onTaken){
   peer.on('open',id=>{
     PVP.myPeerId=id;PVP.myRoomCode=code;
     peer.on('connection',conn=>{
-      if(PVP.oppPeerId&&conn.peer===PVP.oppPeerId)pvpBind(conn,false);
+      // Accept any incoming match connection when not already in a match.
+      // Direct code-connect never sets PVP.oppPeerId on the receiver side,
+      // so we cannot gate on it — accept all incoming and let handshake sort it.
+      if(!PVP.active)pvpBind(conn,false);
     });
     onSuccess&&onSuccess(code);
   });
