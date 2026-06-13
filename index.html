@@ -2037,6 +2037,7 @@ function pvpRenderPlayerList(players){
 function pvpRequestChallenge(targetPeerId,targetName){
   if(!PVP.peer||!PVP.myPeerId)return;
   PVP.pendingTargetPeerId=targetPeerId;
+  notify('⚔ Challenge sent to '+targetName.toUpperCase()+'!','#ffdc00',3500);
   document.getElementById('pvp-lobby-status').textContent='Challenging '+targetName.toUpperCase()+'...';
   const msg={type:'challenge',fromName:PVP.myName,fromPeerId:PVP.myPeerId,targetPeerId};
   if(PVP.isLobbyHost){
@@ -2108,10 +2109,13 @@ function pvpDoConnectToOpponent(){
 // ─ Manual room-ID connect (legacy fallback) ────────────────────────────
 function pvpManualChallenge(){
   const raw=document.getElementById('pvp-target-id').value.trim();
-  if(!raw||!PVP.peer)return;
-  // Accept bare 4-digit code or full sz-XXXX peer ID
+  if(!raw||!PVP.peer){notify('Enter your opponent\'s code first','#ff4136',2000);return;}
   const tid=raw.startsWith('sz-')?raw:'sz-'+raw;
   document.getElementById('pvp-lobby-status').textContent='Connecting...';
+  // Flash the button so player knows tap registered
+  const btn=document.querySelector('#pvp-lobby-screen .pvp-btn.pvp-red');
+  if(btn){const orig=btn.textContent;btn.textContent='[ Sending... ]';btn.disabled=true;setTimeout(()=>{btn.textContent=orig;btn.disabled=false;},3000);}
+  notify('⚔ Challenge sent! Waiting for opponent...','#ffdc00',3500);
   const conn=PVP.peer.connect(tid,{reliable:true});
   pvpBind(conn,true);
 }
