@@ -1374,11 +1374,29 @@ function updateParticles(dt){for(let i=G.particles.length-1;i>=0;i--){const p=G.
 // ─── INPUT ───────────────────────────────────────────────────────────
 document.addEventListener('keydown',e=>{G.keys[e.code]=true;if(e.code==='KeyR')reload();if(e.code==='Escape')togglePause();if(e.code==='Space'&&G.p.ammo[G.p.weapon]&&!G.p.ammo[G.p.weapon].mag)SFX.empty();});
 document.addEventListener('keyup',  e=>{G.keys[e.code]=false;});
-document.addEventListener('mousemove',e=>{if(G.mouse.locked){G.mouse.dx+=e.movementX;G.mouse.dy+=e.movementY;}});
-document.addEventListener('mousedown',e=>{if(e.button===0){G.mouse.down=true;if(G.mouse.locked&&G.running&&!G.paused){const wa=G.p.ammo[G.p.weapon];if(wa&&!wa.mag){SFX.empty();return;}shoot();}}});
+let _lastMX=null,_lastMY=null;
+document.addEventListener('mousemove',e=>{
+  if(G.mouse.locked){G.mouse.dx+=e.movementX;G.mouse.dy+=e.movementY;_lastMX=null;_lastMY=null;}
+  else if(G._fallbackAim&&G.running&&!G.paused){
+    if(_lastMX!==null){G.mouse.dx+=e.clientX-_lastMX;G.mouse.dy+=e.clientY-_lastMY;}
+    _lastMX=e.clientX;_lastMY=e.clientY;
+  }
+});
+document.addEventListener('mousedown',e=>{if(e.button===0){G.mouse.down=true;if((G.mouse.locked||G._fallbackAim)&&G.running&&!G.paused){const wa=G.p.ammo[G.p.weapon];if(wa&&!wa.mag){SFX.empty();return;}shoot();}}});
 document.addEventListener('mouseup',  e=>{if(e.button===0)G.mouse.down=false;});
 canvas.addEventListener('click',()=>{if(G.running&&!G.paused&&!G.mouse.locked)canvas.requestPointerLock();});
-document.addEventListener('pointerlockchange',()=>{G.mouse.locked=document.pointerLockElement===canvas;});
+document.addEventListener('pointerlockerror',()=>{
+  // Fallback for Chromebook / browsers that block pointer lock outside user gesture
+  G._fallbackAim=true; // enable clientX/Y delta aiming as fallback
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen().then(()=>canvas.requestPointerLock()).catch(()=>{});
+  }
+  if(G.running&&!G.paused)notify('Click the game screen to aim','#ffdc00',3000);
+});
+document.addEventListener('pointerlockchange',()=>{
+  if(document.pointerLockElement===canvas){G.mouse.locked=true;G._fallbackAim=false;}
+  else G.mouse.locked=false;
+});
 
 // ─── MOBILE / TOUCH ──────────────────────────────────────────────────
 const IS_TOUCH='ontouchstart' in window||navigator.maxTouchPoints>0;
@@ -1664,8 +1682,9 @@ function gameOver(){
 }
 function checkVictory(){
   if(G.victoryChecked)return;
+  if(PVP.active)return; // 1v1: no enemies on map, vacuous truth would end game instantly
   if(G.levelCfg&&G.levelCfg.environment==='hills')return; // hills uses extraction zone
-  if(G.enemies.every(e=>!e.alive)){
+  if(G.enemies.length>0&&G.enemies.every(e=>!e.alive)){
     G.running=false;G.victoryChecked=true;document.exitPointerLock();
     const bonus=50+STORE.level*10;STORE.coins+=bonus;
     const nextLevel=STORE.level+1;
