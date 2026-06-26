@@ -1384,7 +1384,12 @@ document.addEventListener('mousemove',e=>{
 });
 document.addEventListener('mousedown',e=>{if(e.button===0){G.mouse.down=true;if((G.mouse.locked||G._fallbackAim)&&G.running&&!G.paused){const wa=G.p.ammo[G.p.weapon];if(wa&&!wa.mag){SFX.empty();return;}shoot();}}});
 document.addEventListener('mouseup',  e=>{if(e.button===0)G.mouse.down=false;});
-canvas.addEventListener('click',()=>{if(G.running&&!G.paused&&!G.mouse.locked)canvas.requestPointerLock();});
+function tryLock(){
+  canvas.requestPointerLock();
+  // Chromebook: pointerlockerror may not fire; auto-enable fallback if lock not acquired in 600ms
+  setTimeout(()=>{if(!G.mouse.locked&&G.running){G._fallbackAim=true;}},600);
+}
+canvas.addEventListener('click',()=>{if(G.running&&!G.paused&&!G.mouse.locked)tryLock();});
 document.addEventListener('pointerlockerror',()=>{
   // Fallback for Chromebook / browsers that block pointer lock outside user gesture
   G._fallbackAim=true; // enable clientX/Y delta aiming as fallback
@@ -1656,7 +1661,7 @@ function respawn(){
   document.getElementById('shop').classList.add('hidden');
   initGame();
   G.running=true;G.paused=false;G.lastTime=performance.now();
-  if(!IS_TOUCH)canvas.requestPointerLock();else G.mouse.locked=true;
+  if(!IS_TOUCH)tryLock();else G.mouse.locked=true;
   // Brief level announcement
   const cfg=G.levelCfg;
   setTimeout(()=>notify('LEVEL '+STORE.level+' — Enemies: '+cfg.gunName,'#44ccff',3500),800);
@@ -1673,7 +1678,7 @@ function showOverlay(title,sub,info,btn,onBtn){
 }
 function togglePause(){
   if(!G.running)return;G.paused=!G.paused;
-  if(G.paused){if(!IS_TOUCH)document.exitPointerLock();showOverlay('PAUSED','Mission suspended','Press Resume to continue','Resume',()=>{document.getElementById('overlay').classList.add('hidden');G.paused=false;if(!IS_TOUCH)canvas.requestPointerLock();else G.mouse.locked=true;});}
+  if(G.paused){if(!IS_TOUCH)document.exitPointerLock();showOverlay('PAUSED','Mission suspended','Press Resume to continue','Resume',()=>{document.getElementById('overlay').classList.add('hidden');G.paused=false;if(!IS_TOUCH)tryLock();else G.mouse.locked=true;});}
 }
 function gameOver(){
   G.running=false;document.exitPointerLock();
@@ -2242,7 +2247,7 @@ function pvpBeginMatch(asHost){
   PVP.oppMesh=makeEnemyMesh(0xcc4400,3);
   PVP.oppMesh.position.set(midX,0,oppZ);
   scene.add(PVP.oppMesh);
-  if(!IS_TOUCH)canvas.requestPointerLock();else G.mouse.locked=true;
+  if(!IS_TOUCH)tryLock();else G.mouse.locked=true;
   notify('1v1 VS '+PVP.oppName+' — First to '+PVP_WIN+' kills wins','#ff4136',4500);
   requestAnimationFrame(loop);
 }
@@ -2321,7 +2326,7 @@ document.getElementById('start-btn').addEventListener('click',()=>{
   document.getElementById('overlay').classList.add('hidden');
   if(IS_TOUCH)tryFullscreen();
   initGame();G.running=true;G.paused=false;G.lastTime=performance.now();
-  if(!IS_TOUCH)canvas.requestPointerLock();else G.mouse.locked=true;
+  if(!IS_TOUCH)tryLock();else G.mouse.locked=true;
   const cfg=G.levelCfg;
   setTimeout(()=>notify('LEVEL '+STORE.level+' — Enemies: '+cfg.gunName,'#44ccff',3500),800);
   requestAnimationFrame(loop);
