@@ -1376,32 +1376,25 @@ document.addEventListener('keydown',e=>{G.keys[e.code]=true;if(e.code==='KeyR')r
 document.addEventListener('keyup',  e=>{G.keys[e.code]=false;});
 let _lastMX=null,_lastMY=null;
 document.addEventListener('mousemove',e=>{
-  if(G.mouse.locked){G.mouse.dx+=e.movementX;G.mouse.dy+=e.movementY;_lastMX=null;_lastMY=null;}
-  else if(G._fallbackAim&&G.running&&!G.paused){
-    if(_lastMX!==null){G.mouse.dx+=e.clientX-_lastMX;G.mouse.dy+=e.clientY-_lastMY;}
+  if(document.pointerLockElement===canvas){
+    // Real pointer lock — use movementX/Y (unlimited, no edge issue)
+    G.mouse.dx+=e.movementX;G.mouse.dy+=e.movementY;
+    _lastMX=null;_lastMY=null;
+  } else if(G.running&&!G.paused&&!IS_TOUCH){
+    // Fallback for Chromebook/any desktop without pointer lock — clientX/Y delta
+    if(_lastMX!==null){G.mouse.dx+=(e.clientX-_lastMX)*1.5;G.mouse.dy+=(e.clientY-_lastMY)*1.5;}
     _lastMX=e.clientX;_lastMY=e.clientY;
   }
 });
-document.addEventListener('mousedown',e=>{if(e.button===0){G.mouse.down=true;if((G.mouse.locked||G._fallbackAim)&&G.running&&!G.paused){const wa=G.p.ammo[G.p.weapon];if(wa&&!wa.mag){SFX.empty();return;}shoot();}}});
-document.addEventListener('mouseup',  e=>{if(e.button===0)G.mouse.down=false;});
-function tryLock(){
-  canvas.requestPointerLock();
-  // Chromebook: pointerlockerror may not fire; auto-enable fallback if lock not acquired in 600ms
-  setTimeout(()=>{if(!G.mouse.locked&&G.running){G._fallbackAim=true;}},600);
-}
-canvas.addEventListener('click',()=>{if(G.running&&!G.paused&&!G.mouse.locked)tryLock();});
-document.addEventListener('pointerlockerror',()=>{
-  // Fallback for Chromebook / browsers that block pointer lock outside user gesture
-  G._fallbackAim=true; // enable clientX/Y delta aiming as fallback
-  if(!document.fullscreenElement){
-    document.documentElement.requestFullscreen().then(()=>canvas.requestPointerLock()).catch(()=>{});
+document.addEventListener('mousedown',e=>{
+  if(e.button===0){G.mouse.down=true;
+    if(G.running&&!G.paused&&!IS_TOUCH){const wa=G.p.ammo[G.p.weapon];if(wa&&!wa.mag){SFX.empty();return;}shoot();}
   }
-  if(G.running&&!G.paused)notify('Click the game screen to aim','#ffdc00',3000);
 });
-document.addEventListener('pointerlockchange',()=>{
-  if(document.pointerLockElement===canvas){G.mouse.locked=true;G._fallbackAim=false;}
-  else G.mouse.locked=false;
-});
+document.addEventListener('mouseup',e=>{if(e.button===0)G.mouse.down=false;});
+function tryLock(){try{canvas.requestPointerLock();}catch(err){}}
+canvas.addEventListener('click',()=>{if(G.running&&!G.paused&&document.pointerLockElement!==canvas)tryLock();});
+document.addEventListener('pointerlockchange',()=>{G.mouse.locked=document.pointerLockElement===canvas;if(G.mouse.locked)_lastMX=null;});
 
 // ─── MOBILE / TOUCH ──────────────────────────────────────────────────
 const IS_TOUCH='ontouchstart' in window||navigator.maxTouchPoints>0;
@@ -1521,7 +1514,7 @@ function updatePlayer(dt){
   }
 
   if(len>0&&G.p.onGround){G.p.stepTimer-=dt;if(G.p.stepTimer<=0){SFX.step();G.p.stepTimer=spd>6?0.32:0.46;}}else if(G.p.onGround)G.p.stepTimer=0;
-  if(G.p.weapon==='lmg'&&(G.mouse.down||TCH.fire)&&G.mouse.locked){G.p.autoFireTimer-=dt;if(G.p.autoFireTimer<=0){shoot();G.p.autoFireTimer=0.085;}}
+  if(G.p.weapon==='lmg'&&(G.mouse.down||TCH.fire)&&(G.mouse.locked||TCH.fire||!IS_TOUCH)){G.p.autoFireTimer-=dt;if(G.p.autoFireTimer<=0){shoot();G.p.autoFireTimer=0.085;}}
   if(G.p.reloading){G.p.reloadTimer-=dt*1000;document.getElementById('reload-bar').style.width=(1-G.p.reloadTimer/G.p.reloadDuration)*100+'%';if(G.p.reloadTimer<=0)finishReload();}
   if(STORE.upgrades.has('regen')&&G.p.hp<G.p.maxHp&&G.p.hp>0){G.p.hp=Math.min(G.p.maxHp,G.p.hp+3*dt);updateHUD();}
   // Shield regen: regens 4s after last hit, 8/sec, up to maxShield
