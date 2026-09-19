@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Play Games</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#0a0c10;color:#eceae3;font-family:'Segoe UI',system-ui,sans-serif;display:flex;align-items:center;justify-content:center}
+.wrap{text-align:center;padding:24px}
+h1{font-size:clamp(28px,6vw,52px);font-weight:800;letter-spacing:.04em;margin-bottom:6px;color:#fff}
+.sub{color:#6b727b;font-size:15px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:48px}
+.games{display:flex;gap:24px;flex-wrap:wrap;justify-content:center}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:32px 36px;width:260px;text-decoration:none;color:inherit;transition:background .15s,transform .1s,border-color .15s;cursor:pointer}
+.card:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.25);transform:translateY(-3px)}
+.card:active{transform:translateY(0)}
+.icon{font-size:52px;margin-bottom:16px}
+.card h2{font-size:22px;font-weight:700;letter-spacing:.03em;margin-bottom:8px}
+.card p{font-size:13px;color:#9aa1a9;line-height:1.55}
+.badge{display:inline-block;margin-top:14px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12)}
+.badge.fps{color:#ff5a4a;border-color:rgba(255,90,74,.3);background:rgba(255,90,74,.1)}
+.badge.racing{color:#35c8ff;border-color:rgba(53,200,255,.3);background:rgba(53,200,255,.1)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>GAMES</h1>
+  <p class="sub">Choose your game</p>
+  <div class="games">
+    <a class="card" href="/sector-zero">
+      <div class="icon">🔫</div>
+      <h2>Sector Zero</h2>
+      <p>Military FPS. Fight through enemy zones, upgrade your loadout, and take on friends in 1v1.</p>
+      <span class="badge fps">FPS • 1v1</span>
+    </a>
+    <a class="card" href="/meridian-basin">
+      <div class="icon">🏎️</div>
+      <h2>Meridian Basin</h2>
+      <p>High-speed racing through winding roads and dramatic landscapes.</p>
+      <span class="badge racing">Racing</span>
+    </a>
+  </div>
+</div>
+</body>
+</html>
