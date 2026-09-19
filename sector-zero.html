@@ -1393,7 +1393,9 @@ canvas.addEventListener('click',()=>{if(G.running&&!G.paused&&document.pointerLo
 document.addEventListener('pointerlockchange',()=>{G.mouse.locked=document.pointerLockElement===canvas;_mx=null;_my=null;});
 
 // ─── MOBILE / TOUCH ──────────────────────────────────────────────────
-const IS_TOUCH='ontouchstart' in window||navigator.maxTouchPoints>0;
+// IS_MOBILE = actual phone/tablet (not Chromebook/Surface with touchscreen)
+const IS_MOBILE=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+const IS_TOUCH=IS_MOBILE&&('ontouchstart' in window||navigator.maxTouchPoints>0);
 if(IS_TOUCH){document.body.classList.add('touch-device');G.mouse.locked=true;}
 
 function checkOrient(){}
