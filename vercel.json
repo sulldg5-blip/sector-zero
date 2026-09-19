@@ -1,6 +1,7 @@
 {
   "cleanUrls": true,
   "rewrites": [
+    { "source": "/", "destination": "/home.html" },
     { "source": "/sector-zero", "destination": "/sector-zero.html" },
     { "source": "/meridian-basin", "destination": "/meridian-basin.html" }
   ]
