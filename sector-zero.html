@@ -1374,23 +1374,17 @@ function updateParticles(dt){for(let i=G.particles.length-1;i>=0;i--){const p=G.
 // ─── INPUT ───────────────────────────────────────────────────────────
 document.addEventListener('keydown',e=>{G.keys[e.code]=true;if(e.code==='KeyR')reload();if(e.code==='Escape')togglePause();if(e.code==='Space'&&G.p.ammo[G.p.weapon]&&!G.p.ammo[G.p.weapon].mag)SFX.empty();});
 document.addEventListener('keyup',  e=>{G.keys[e.code]=false;});
-let _mx=null,_my=null;
+// movementX/Y works in all modern browsers with OR without pointer lock
 document.addEventListener('mousemove',e=>{
   if(!G.running||G.paused||IS_TOUCH)return;
-  if(document.pointerLockElement===canvas){
-    G.mouse.dx+=e.movementX;G.mouse.dy+=e.movementY;
-    _mx=null;_my=null;
-  } else {
-    // No pointer lock (Chromebook etc) — always track clientX/Y delta immediately
-    if(_mx!==null){G.mouse.dx+=(e.clientX-_mx)*1.5;G.mouse.dy+=(e.clientY-_my)*1.5;}
-    _mx=e.clientX;_my=e.clientY;
-  }
+  G.mouse.dx+=e.movementX;G.mouse.dy+=e.movementY;
 });
 document.addEventListener('mousedown',e=>{if(e.button===0){G.mouse.down=true;if(G.running&&!G.paused&&!IS_TOUCH){const wa=G.p.ammo[G.p.weapon];if(wa&&!wa.mag){SFX.empty();return;}shoot();}}});
 document.addEventListener('mouseup',e=>{if(e.button===0)G.mouse.down=false;});
-function tryLock(){try{canvas.requestPointerLock();}catch(e){}}
-canvas.addEventListener('click',()=>{if(G.running&&!G.paused&&document.pointerLockElement!==canvas)tryLock();});
-document.addEventListener('pointerlockchange',()=>{G.mouse.locked=document.pointerLockElement===canvas;_mx=null;_my=null;});
+// Pointer lock hides the cursor — not required for aiming, just cosmetic
+function tryLock(){try{const p=canvas.requestPointerLock();if(p&&p.catch)p.catch(()=>{});}catch(e){}}
+canvas.addEventListener('click',()=>{if(G.running&&!G.paused)tryLock();});
+document.addEventListener('pointerlockchange',()=>{G.mouse.locked=document.pointerLockElement===canvas;});
 
 // ─── MOBILE / TOUCH ──────────────────────────────────────────────────
 // IS_MOBILE = actual phone/tablet (not Chromebook/Surface with touchscreen)
