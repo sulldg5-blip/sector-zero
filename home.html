@@ -6,39 +6,79 @@
 <title>Play Games</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#0a0c10;color:#eceae3;font-family:'Segoe UI',system-ui,sans-serif;display:flex;align-items:center;justify-content:center}
-.wrap{text-align:center;padding:24px}
-h1{font-size:clamp(28px,6vw,52px);font-weight:800;letter-spacing:.04em;margin-bottom:6px;color:#fff}
-.sub{color:#6b727b;font-size:15px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:48px}
-.games{display:flex;gap:24px;flex-wrap:wrap;justify-content:center}
-.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:32px 36px;width:260px;text-decoration:none;color:inherit;transition:background .15s,transform .1s,border-color .15s;cursor:pointer}
-.card:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.25);transform:translateY(-3px)}
-.card:active{transform:translateY(0)}
-.icon{font-size:52px;margin-bottom:16px}
-.card h2{font-size:22px;font-weight:700;letter-spacing:.03em;margin-bottom:8px}
-.card p{font-size:13px;color:#9aa1a9;line-height:1.55}
-.badge{display:inline-block;margin-top:14px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12)}
-.badge.fps{color:#ff5a4a;border-color:rgba(255,90,74,.3);background:rgba(255,90,74,.1)}
-.badge.racing{color:#35c8ff;border-color:rgba(53,200,255,.3);background:rgba(53,200,255,.1)}
+html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif}
+.split{display:flex;height:100vh;width:100vw}
+.half{flex:1;position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;transition:flex .45s cubic-bezier(.4,0,.2,1)}
+.half:hover{flex:1.35}
+.half a{position:absolute;inset:0;z-index:3;text-decoration:none}
+
+/* Sector Zero — dark military */
+.sz{background:#0a0c10}
+.sz .bg{position:absolute;inset:0;background:
+  repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(255,90,74,.04) 40px,rgba(255,90,74,.04) 41px),
+  repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(255,90,74,.04) 40px,rgba(255,90,74,.04) 41px),
+  radial-gradient(ellipse at 30% 50%,rgba(255,90,74,.18) 0%,transparent 65%);
+}
+.sz .content{position:relative;z-index:2;text-align:center;padding:32px;color:#fff}
+.sz .icon{font-size:clamp(64px,10vw,110px);margin-bottom:20px;filter:drop-shadow(0 0 30px rgba(255,90,74,.7))}
+.sz h1{font-size:clamp(28px,5vw,62px);font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#fff;text-shadow:0 0 40px rgba(255,90,74,.8);margin-bottom:10px}
+.sz .sub{font-size:clamp(11px,1.5vw,16px);letter-spacing:.2em;text-transform:uppercase;color:rgba(255,90,74,.8);margin-bottom:28px}
+.sz .tag{display:inline-block;padding:8px 20px;border:1px solid rgba(255,90,74,.5);border-radius:4px;color:#ff5a4a;font-size:clamp(10px,1.2vw,13px);letter-spacing:.2em;text-transform:uppercase;background:rgba(255,90,74,.1)}
+.sz .play{margin-top:24px;display:inline-block;padding:14px 36px;background:#ff5a4a;color:#fff;font-weight:700;font-size:clamp(13px,1.6vw,17px);letter-spacing:.12em;text-transform:uppercase;border-radius:6px;transition:background .15s,transform .1s}
+.sz:hover .play{background:#ff7060;transform:scale(1.05)}
+
+/* Meridian Basin — clean racing */
+.mb{background:#0d1520}
+.mb .bg{position:absolute;inset:0;background:
+  repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(53,200,255,.04) 40px,rgba(53,200,255,.04) 41px),
+  repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(53,200,255,.04) 40px,rgba(53,200,255,.04) 41px),
+  radial-gradient(ellipse at 70% 50%,rgba(53,200,255,.18) 0%,transparent 65%);
+}
+.mb .content{position:relative;z-index:2;text-align:center;padding:32px;color:#fff}
+.mb .icon{font-size:clamp(64px,10vw,110px);margin-bottom:20px;filter:drop-shadow(0 0 30px rgba(53,200,255,.7))}
+.mb h1{font-size:clamp(28px,5vw,62px);font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#fff;text-shadow:0 0 40px rgba(53,200,255,.8);margin-bottom:10px}
+.mb .sub{font-size:clamp(11px,1.5vw,16px);letter-spacing:.2em;text-transform:uppercase;color:rgba(53,200,255,.8);margin-bottom:28px}
+.mb .tag{display:inline-block;padding:8px 20px;border:1px solid rgba(53,200,255,.5);border-radius:4px;color:#35c8ff;font-size:clamp(10px,1.2vw,13px);letter-spacing:.2em;text-transform:uppercase;background:rgba(53,200,255,.1)}
+.mb .play{margin-top:24px;display:inline-block;padding:14px 36px;background:#35c8ff;color:#061520;font-weight:700;font-size:clamp(13px,1.6vw,17px);letter-spacing:.12em;text-transform:uppercase;border-radius:6px;transition:background .15s,transform .1s}
+.mb:hover .play{background:#5fd6ff;transform:scale(1.05)}
+
+/* Divider */
+.divider{position:absolute;left:50%;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.3) 20%,rgba(255,255,255,.3) 80%,transparent);z-index:10;transform:translateX(-50%);pointer-events:none}
+
+/* Mobile */
+@media(max-width:600px){
+  .split{flex-direction:column}
+  .half:hover{flex:1.25}
+  .divider{left:0;right:0;top:50%;bottom:auto;width:100%;height:2px;background:linear-gradient(to right,transparent,rgba(255,255,255,.3) 20%,rgba(255,255,255,.3) 80%,transparent)}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>GAMES</h1>
-  <p class="sub">Choose your game</p>
-  <div class="games">
-    <a class="card" href="/sector-zero">
+<div class="split">
+  <div class="half sz">
+    <div class="bg"></div>
+    <div class="content">
       <div class="icon">🔫</div>
-      <h2>Sector Zero</h2>
-      <p>Military FPS. Fight through enemy zones, upgrade your loadout, and take on friends in 1v1.</p>
-      <span class="badge fps">FPS • 1v1</span>
-    </a>
-    <a class="card" href="/meridian-basin">
+      <h1>Sector Zero</h1>
+      <div class="sub">Military FPS</div>
+      <div class="tag">FPS &nbsp;·&nbsp; 1v1 Multiplayer</div>
+      <div class="play">PLAY NOW</div>
+    </div>
+    <a href="/sector-zero"></a>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="half mb">
+    <div class="bg"></div>
+    <div class="content">
       <div class="icon">🏎️</div>
-      <h2>Meridian Basin</h2>
-      <p>High-speed racing through winding roads and dramatic landscapes.</p>
-      <span class="badge racing">Racing</span>
-    </a>
+      <h1>Meridian Basin</h1>
+      <div class="sub">Racing Game</div>
+      <div class="tag">High Speed &nbsp;·&nbsp; Racing</div>
+      <div class="play">PLAY NOW</div>
+    </div>
+    <a href="/meridian-basin"></a>
   </div>
 </div>
 </body>
