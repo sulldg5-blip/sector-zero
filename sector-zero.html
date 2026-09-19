@@ -1374,17 +1374,33 @@ function updateParticles(dt){for(let i=G.particles.length-1;i>=0;i--){const p=G.
 // ─── INPUT ───────────────────────────────────────────────────────────
 document.addEventListener('keydown',e=>{G.keys[e.code]=true;if(e.code==='KeyR')reload();if(e.code==='Escape')togglePause();if(e.code==='Space'&&G.p.ammo[G.p.weapon]&&!G.p.ammo[G.p.weapon].mag)SFX.empty();});
 document.addEventListener('keyup',  e=>{G.keys[e.code]=false;});
-// movementX/Y works in all modern browsers with OR without pointer lock
+// Mouse aiming: use movementX/Y (works with pointer lock) + clientX/Y delta fallback
+let _mx=null,_my=null;
 document.addEventListener('mousemove',e=>{
   if(!G.running||G.paused||IS_TOUCH)return;
-  G.mouse.dx+=e.movementX;G.mouse.dy+=e.movementY;
+  if(document.pointerLockElement===canvas){
+    // Pointer lock active: movementX/Y is accurate & unlimited
+    G.mouse.dx+=e.movementX;G.mouse.dy+=e.movementY;
+    _mx=null;_my=null;
+  } else {
+    // No pointer lock: movementX/Y may be 0 per spec; use clientX/Y delta
+    if(e.movementX||e.movementY){G.mouse.dx+=e.movementX;G.mouse.dy+=e.movementY;}
+    else if(_mx!==null){G.mouse.dx+=(e.clientX-_mx)*2;G.mouse.dy+=(e.clientY-_my)*2;}
+    _mx=e.clientX;_my=e.clientY;
+  }
 });
-document.addEventListener('mousedown',e=>{if(e.button===0){G.mouse.down=true;if(G.running&&!G.paused&&!IS_TOUCH){const wa=G.p.ammo[G.p.weapon];if(wa&&!wa.mag){SFX.empty();return;}shoot();}}});
+document.addEventListener('mousedown',e=>{
+  if(e.button===0){
+    G.mouse.down=true;
+    // Try pointer lock on every click (user gesture required)
+    if(G.running&&!G.paused&&document.pointerLockElement!==canvas)tryLock();
+    if(G.running&&!G.paused&&!IS_TOUCH){const wa=G.p.ammo[G.p.weapon];if(wa&&!wa.mag){SFX.empty();return;}shoot();}
+  }
+});
 document.addEventListener('mouseup',e=>{if(e.button===0)G.mouse.down=false;});
-// Pointer lock hides the cursor — not required for aiming, just cosmetic
-function tryLock(){try{const p=canvas.requestPointerLock();if(p&&p.catch)p.catch(()=>{});}catch(e){}}
-canvas.addEventListener('click',()=>{if(G.running&&!G.paused)tryLock();});
-document.addEventListener('pointerlockchange',()=>{G.mouse.locked=document.pointerLockElement===canvas;});
+function tryLock(){try{const p=canvas.requestPointerLock();if(p instanceof Promise)p.catch(()=>{});}catch(e){}}
+canvas.addEventListener('click',()=>{if(G.running&&!G.paused&&document.pointerLockElement!==canvas)tryLock();});
+document.addEventListener('pointerlockchange',()=>{G.mouse.locked=document.pointerLockElement===canvas;_mx=null;_my=null;});
 
 // ─── MOBILE / TOUCH ──────────────────────────────────────────────────
 // IS_MOBILE = actual phone/tablet (not Chromebook/Surface with touchscreen)
